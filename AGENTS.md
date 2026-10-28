@@ -36,9 +36,8 @@ facility by finding a way past fixed gas zones and switching vents. Each room is
 - `scripts/smoke/`: `GasZone` (a fixed rectangle of Low/Medium/Strong gas, placed in the level
   or on the Level in `main.tscn`; it never spreads, and a running Vent in its room clears it),
   `SmokeConfig` (gas strengths, clear speed and look, default `config/smoke.tres`, per-level
-  override via `Level.smoke_config`) and `smoke.gdshader`, which tiles the ArtTheme's smoke
-  frames (sliced from `smoke_sheet` by `ArtTheme.smoke_animation_frames()`) plus the optional
-  `smoke_edge_mask`.
+  override via `Level.smoke_config`) and `smoke.gdshader`, which draws the gas procedurally
+  (animated noise in world space, no art).
 - `scripts/lighting/`: `LightingConfig` (settings, default `config/lighting.tres`, per-level override
   via `Level.lighting`), `PlayerLight` (the player's PointLight2D) and `Lighting` (occluder helpers).
   Walls and closed doors get `LightOccluder2D`s.

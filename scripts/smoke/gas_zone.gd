@@ -5,22 +5,24 @@ extends Node2D
 ## main.tscn), with the node's position as the top-left corner, and pick its `size` and
 ## `strength`. Gas never moves or spreads: it stays where it is placed, a running Vent in the
 ## same room clears it, and it comes back once that vent is switched off.
+## Where zones touch, their gas blends from one strength into the other over `blend_width`
+## (in the smoke settings); only the look blends, the danger switches right at the edge.
 
 enum Strength { LOW, MEDIUM, STRONG }
 
 const SHADER := preload("res://scripts/smoke/smoke.gdshader")
-## World pixels per texel of the edge-fade mask.
+## World pixels per texel of the density mask.
 const MASK_STEP := 20.0
 const LABELS := ["Low gas", "Medium gas", "Strong gas"]
 
 @export var strength := Strength.MEDIUM:
 	set(value):
 		strength = value
-		_refresh()
+		_refresh_level()
 @export var size := Vector2(600, 400):
 	set(value):
 		size = value
-		_refresh()
+		_refresh_level()
 
 ## The room this zone's center is in; its vents clear the zone. Set by the Level.
 var room: Room
@@ -28,23 +30,26 @@ var room: Room
 var cleared := 0.0
 var _config: SmokeConfig
 var _sprite: Sprite2D
-var _frames: Array[Texture2D] = []
-var _frame_time := 0.0
-var _shown_frame := -1
+## True while a refresh of every zone in the level is waiting for the end of the frame.
+static var _level_refresh_queued := false
 
 
 func _ready() -> void:
 	_sprite = Sprite2D.new()
 	_sprite.centered = false
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	_sprite.z_index = 3
+	# Above the player (4) and doors (2), so the player walks inside the gas.
+	_sprite.z_index = 5
 	add_child(_sprite, false, Node.INTERNAL_MODE_FRONT)
-	_frames = ArtTheme.active().smoke_animation_frames()
+	if Engine.is_editor_hint():
+		set_notify_transform(true)
 	_refresh()
 
 
-func _process(delta: float) -> void:
-	_animate(delta)
+func _notification(what: int) -> void:
+	# Moving a zone in the editor changes how it and its old and new neighbours blend.
+	if what == NOTIFICATION_TRANSFORM_CHANGED:
+		_refresh_level()
 
 
 func rect() -> Rect2:
@@ -66,6 +71,15 @@ func step(delta: float, vent_running: bool) -> void:
 	_sprite.material.set_shader_parameter("amount", 1.0 - cleared)
 
 
+## The strongest of these zones' densities at a point, or -1 if none of them covers it.
+func _density_at(zones: Array, point: Vector2) -> float:
+	var result := -1.0
+	for zone: GasZone in zones:
+		if zone.contains(point):
+			result = maxf(result, zone._strength_density())
+	return result
+
+
 func _strength_density() -> float:
 	var settings := _settings()
 	match strength:
@@ -79,13 +93,69 @@ func _strength_density() -> float:
 ## The owning Level's smoke settings, or the default ones.
 func _settings() -> SmokeConfig:
 	if _config == null:
-		var node := get_parent()
-		while node and not node is Level:
-			node = node.get_parent()
+		var level := _level_node()
 		# get() rather than .smoke_config: in the editor the Level's script doesn't run.
-		var level_config: SmokeConfig = node.get("smoke_config") if node else null
+		var level_config: SmokeConfig = level.get("smoke_config") if level else null
 		_config = level_config if level_config else SmokeConfig.load_default()
 	return _config
+
+
+## The Level this zone belongs to (a plain node in the editor), or null.
+func _level_node() -> Node:
+	var node := get_parent()
+	while node and not node is Level:
+		node = node.get_parent()
+	return node
+
+
+## Every Room in the same level.
+func _level_rooms() -> Array[Room]:
+	var rooms: Array[Room] = []
+	var level := _level_node()
+	if level:
+		for node in level.find_children("*", "Node2D", true, false):
+			if node is Room:
+				rooms.append(node)
+	return rooms
+
+
+## Whether two points are inside the same room.
+func _same_room(rooms: Array[Room], a: Vector2, b: Vector2) -> bool:
+	for room in rooms:
+		if room.contains(a):
+			return room.contains(b)
+	return false
+
+
+## Every gas zone in the same level, including this one.
+func _level_zones() -> Array[GasZone]:
+	var zones: Array[GasZone] = []
+	var level := _level_node()
+	if level == null:
+		zones.append(self)
+		return zones
+	for node in level.find_children("*", "Node2D", true, false):
+		if node is GasZone:
+			zones.append(node)
+	return zones
+
+
+## Rebuilds every zone in the level once at the end of the frame, so neighbours blend again.
+func _refresh_level() -> void:
+	if not is_inside_tree():
+		return
+	if not Engine.is_editor_hint():
+		_refresh()
+		return
+	if _level_refresh_queued:
+		return
+	_level_refresh_queued = true
+	(func() -> void:
+		_level_refresh_queued = false
+		if is_inside_tree():
+			for zone in _level_zones():
+				zone._refresh()
+	).call_deferred()
 
 
 ## Rebuilds the density mask and material after the size or strength changes.
@@ -94,56 +164,55 @@ func _refresh() -> void:
 	if _sprite == null:
 		return
 	var settings := _settings()
+	var area := rect()
+	var neighbours := _level_zones().filter(func(zone: GasZone) -> bool:
+		return zone != self and zone.rect().intersects(area.grow(1.0)))
+	var rooms := _level_rooms()
 	var texels := Vector2i(maxi(1, ceili(size.x / MASK_STEP)), maxi(1, ceili(size.y / MASK_STEP)))
 	var mask := Image.create(texels.x, texels.y, false, Image.FORMAT_L8)
 	var value := _strength_density()
 	for y in texels.y:
 		for x in texels.x:
-			var point := (Vector2(x, y) + Vector2(0.5, 0.5)) * size / Vector2(texels)
-			var edge := minf(minf(point.x, size.x - point.x), minf(point.y, size.y - point.y))
-			var fade := 1.0 if settings.edge_fade <= 0.0 else smoothstep(0.0, settings.edge_fade, edge)
-			mask.set_pixel(x, y, Color(value * fade, 0.0, 0.0))
+			var local := (Vector2(x, y) + Vector2(0.5, 0.5)) * size / Vector2(texels)
+			var point := area.position + local
+			var density := value
+			var fade := 1.0
+			# Each side: blend toward the zone across it. With no zone there, fade out only if the
+			# other side is open floor of the same room; at a wall the gas stays thick.
+			var sides := [
+				[local.x, Vector2(area.position.x - 1.0, point.y)],
+				[size.x - local.x, Vector2(area.end.x + 1.0, point.y)],
+				[local.y, Vector2(point.x, area.position.y - 1.0)],
+				[size.y - local.y, Vector2(point.x, area.end.y + 1.0)],
+			]
+			for side in sides:
+				var distance: float = side[0]
+				var across := _density_at(neighbours, side[1])
+				if across >= 0.0:
+					if distance < settings.blend_width:
+						# Half way to the neighbour's density at the edge, where the neighbour
+						# does the same from its side, so both meet at the same value.
+						density += (across - value) * 0.5 * (1.0 - smoothstep(0.0, settings.blend_width, distance))
+				elif settings.edge_fade > 0.0 and _same_room(rooms, point, side[1]):
+					fade = minf(fade, smoothstep(0.0, settings.edge_fade, distance))
+			mask.set_pixel(x, y, Color(clampf(density * fade, 0.0, 1.0), 0.0, 0.0))
 	_sprite.texture = ImageTexture.create_from_image(mask)
 	_sprite.scale = size / Vector2(texels)
 
 	var shader_material := ShaderMaterial.new()
 	shader_material.shader = SHADER
-	shader_material.set_shader_parameter("tint", settings.tint)
+	shader_material.set_shader_parameter("color", settings.color)
+	shader_material.set_shader_parameter("highlight_color", settings.highlight_color)
+	shader_material.set_shader_parameter("highlight_amount", settings.highlight_amount)
 	shader_material.set_shader_parameter("opacity", settings.opacity)
-	shader_material.set_shader_parameter("thickness", settings.thickness)
-	shader_material.set_shader_parameter("tile_size", settings.tile_size)
+	shader_material.set_shader_parameter("noise_scale", settings.noise_scale)
 	shader_material.set_shader_parameter("drift", settings.drift)
-	shader_material.set_shader_parameter("luminance_as_alpha", settings.alpha_source == SmokeConfig.AlphaSource.LUMINANCE)
+	shader_material.set_shader_parameter("swirl_speed", settings.swirl_speed)
+	shader_material.set_shader_parameter("warp", settings.warp)
 	shader_material.set_shader_parameter("edge_breakup", settings.edge_breakup)
 	shader_material.set_shader_parameter("edge_softness", settings.edge_softness)
-	var art := ArtTheme.active()
-	shader_material.set_shader_parameter("use_edge_mask", art.smoke_edge_mask != null)
-	shader_material.set_shader_parameter("edge_mask", art.smoke_edge_mask)
-	shader_material.set_shader_parameter("edge_mask_size", settings.edge_mask_size)
 	shader_material.set_shader_parameter("amount", 1.0 - cleared)
 	_sprite.material = shader_material
-	_sprite.visible = not _frames.is_empty()
-	_shown_frame = -1
-	if _frames.is_empty():
-		push_warning("ArtTheme has no smoke_sheet or smoke_frames; gas is invisible.")
-
-
-## Steps through the animation frames, optionally fading each into the next.
-func _animate(delta: float) -> void:
-	if _frames.is_empty() or _sprite == null:
-		return
-	var settings := _settings()
-	_frame_time += delta * settings.frame_rate
-	var index := int(_frame_time) % _frames.size()
-	if index != _shown_frame:
-		_shown_frame = index
-		_sprite.material.set_shader_parameter("frame_a", _frames[index])
-		_sprite.material.set_shader_parameter("frame_b", _frames[(index + 1) % _frames.size()])
-	var progress := fmod(_frame_time, 1.0)
-	var blend := 0.0
-	if settings.crossfade > 0.0:
-		blend = smoothstep(1.0 - settings.crossfade, 1.0, progress)
-	_sprite.material.set_shader_parameter("blend", blend)
 
 
 ## In the editor, outlines the zone and names its strength so it's easy to find and select.

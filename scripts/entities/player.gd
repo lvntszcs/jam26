@@ -12,11 +12,11 @@ signal died
 @export var acceleration := 2400.0
 @export var friction := 2800.0
 ## Size in world pixels that one spritesheet frame is fitted into.
-@export var footprint := Vector2(110, 110)
+@export var footprint := Vector2(200, 200)
 ## How quickly the sprite turns toward the walking direction (higher = snappier).
 @export var turn_speed := 14.0
 ## How close (from the player's centre) an object must be to interact with it.
-@export var interact_range := 120.0
+@export var interact_range := 170.0
 @export var max_air := 100.0
 ## Air lost per second in a room full of smoke.
 @export var air_loss_per_second := 30.0
