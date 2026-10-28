@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/lighting/player_light.gd" id="2_light"]
+[ext_resource type="AudioStream" path="res://audio/sfx/one_step.wav" id="3_footstep"]
 
 [sub_resource type="CircleShape2D" id="body"]
 radius = 30.0
@@ -18,6 +19,11 @@ shape = SubResource("body")
 
 [node name="Light" type="PointLight2D" parent="."]
 script = ExtResource("2_light")
+
+[node name="Footstep" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_footstep")
+max_polyphony = 4
+bus = &"Footsteps"
 
 [node name="Camera" type="Camera2D" parent="."]
 position_smoothing_enabled = true

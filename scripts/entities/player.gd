@@ -35,10 +35,12 @@ var air := 0.0
 var is_active := true
 var _walk_time := 0.0
 var _step_distance := 0.0
+var _footstep_index := 0
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var camera: Camera2D = $Camera
 @onready var light: PlayerLight = $Light
+@onready var footstep: AudioStreamPlayer = $Footstep
 @onready var radius: float = ($Collision.shape as CircleShape2D).radius
 
 
@@ -104,6 +106,10 @@ func _movement_feedback(distance: float) -> void:
 		if _step_distance >= 65.0:
 			_step_distance = fmod(_step_distance, 65.0)
 			Haptics.pulse(0.12, 0.04, 0.035)
+			# A lower footstep every two, then three steps (2, 5, 7, 10, ...).
+			_footstep_index = (_footstep_index + 1) % 5
+			footstep.pitch_scale = 0.92 if _footstep_index == 2 or _footstep_index == 0 else 1.0
+			footstep.play()
 
 
 func _breathe(delta: float) -> void:
