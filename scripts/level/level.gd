@@ -41,6 +41,10 @@ func _ready() -> void:
 		room.build()
 	for object in objects:
 		object.setup(self, room_at(object.global_position))
+		if object is Door:
+			(object as Door).toggled.connect(_on_door_toggled)
+		elif object is Vent:
+			(object as Vent).toggled.connect(_on_vent_toggled)
 		if object.room == null and not object is Door:
 			push_warning("%s is not inside any room." % object.name)
 	_setup_smoke()
@@ -123,18 +127,29 @@ func interact(by: Player) -> void:
 
 func complete() -> void:
 	_finish()
+	Haptics.pulse(0.65, 0.25, 0.35, 3)
 	completed.emit()
 
 
 func fail() -> void:
 	_finish()
+	Haptics.pulse(0.35, 0.85, 0.5, 3)
 	failed.emit()
 
 
 func _finish() -> void:
+	Haptics.stop()
 	is_finished = true
 	player.is_active = false
 	_highlight.visible = false
+
+
+func _on_door_toggled(_is_open: bool) -> void:
+	Haptics.pulse(0.35, 0.5, 0.12, 2)
+
+
+func _on_vent_toggled(_is_on: bool) -> void:
+	Haptics.pulse(0.45, 0.15, 0.08, 2)
 
 
 func _collect(node: Node) -> void:
@@ -169,6 +184,7 @@ func _spawn_player() -> void:
 	player.level = self
 	player.position = start.global_position
 	player.died.connect(fail)
+	player.tick_damage.connect(_on_player_tick_damage)
 	add_child(player)
 	var area := bounds()
 	player.camera.zoom = Vector2.ONE * camera_zoom
@@ -187,6 +203,10 @@ func _setup_smoke() -> void:
 		surface.setup(self, room, config)
 		room.add_child(surface)
 		_smoke_surfaces[room] = surface
+
+
+func _on_player_tick_damage(_amount: float) -> void:
+	Haptics.play_event(&"tick_damage")
 
 
 ## Darkens the world with a CanvasModulate and gives the player's light its settings.
