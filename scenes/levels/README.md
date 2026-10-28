@@ -57,7 +57,9 @@ Gas never moves or spreads. It sits in **gas zones**, each with one of three str
 2. Its **position** is the top-left corner. Set **Size** and **Strength** (Low, Medium or
    Strong). In the editor the zone shows the gas itself, with an outline and its strength
    (lime = Low, rust = Medium, violet = Strong).
-3. Zones may overlap; the strongest one counts.
+3. Zones may overlap; the strongest one counts. Where zones touch, the gas blends from one
+   strength into the other over `blend_width` (only the look: the danger changes right at the
+   edge). The gas draws over the player.
 
 A running **Vent** clears every zone whose centre is in its room, and the gas comes back when it
 is switched off. Doors only block the way.

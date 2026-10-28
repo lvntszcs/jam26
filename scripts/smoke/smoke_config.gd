@@ -41,7 +41,11 @@ const DEFAULT_PATH := "res://config/smoke.tres"
 @export_range(0.0, 1.0) var low_density := 0.35
 @export_range(0.0, 1.0) var medium_density := 0.65
 @export_range(0.0, 1.0) var strong_density := 1.0
-## Width in world pixels of the soft fade at a gas zone's edges. Only changes the look.
+## Width in world pixels over which touching zones of different strengths blend into each
+## other. Only changes the look: the danger switches right at the edge.
+@export var blend_width := 200.0
+## Width in world pixels of a soft fade on zone edges that don't touch another zone.
+## Only changes the look.
 @export var edge_fade := 0.0
 ## How fast a running vent clears its room's gas, and how fast the gas returns once it stops:
 ## the fraction of the gas cleared per second (1 = one second).

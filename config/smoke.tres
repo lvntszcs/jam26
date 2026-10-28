@@ -17,5 +17,6 @@ edge_softness = 0.25
 low_density = 0.35
 medium_density = 0.65
 strong_density = 1.0
+blend_width = 200.0
 edge_fade = 0.0
 clear_speed = 0.5

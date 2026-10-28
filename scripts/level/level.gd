@@ -56,7 +56,7 @@ func _ready() -> void:
 	_add_void_backdrop()
 	_highlight = Sprite2D.new()
 	_highlight.texture = ArtTheme.active().highlight
-	_highlight.z_index = 5
+	_highlight.z_index = 6
 	_highlight.visible = false
 	add_child(_highlight)
 
