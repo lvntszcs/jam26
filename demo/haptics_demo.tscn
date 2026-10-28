@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://41inwvrn4cdb"]
+
+[ext_resource type="Script" uid="uid://c220jmky2bii2" path="res://demo/haptics_demo.gd" id="1_demo"]
+
+[node name="HapticsDemo" type="Control" unique_id=526757007]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_demo")
+
+[node name="Background" type="ColorRect" parent="." unique_id=644201208]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.25098, 0.00392157, 0.0862745, 1)
+
+[node name="Tilt" type="ColorRect" parent="." unique_id=1533804482]
+layout_mode = 0
+offset_right = 48.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.827451, 0.996078, 0.156863, 1)
+
+[node name="Info" type="Label" parent="." unique_id=838067254]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 624.0
+offset_bottom = 240.0
+theme_override_colors/font_color = Color(0.945098, 0.992157, 0.85098, 1)
+theme_override_font_sizes/font_size = 20
+
+[node name="Status" type="Label" parent="." unique_id=385207922]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -130.0
+offset_right = 624.0
+offset_bottom = -24.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.203922, 0.568627, 0.537255, 1)
+theme_override_font_sizes/font_size = 18
