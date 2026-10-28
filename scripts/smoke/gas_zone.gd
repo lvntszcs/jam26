@@ -108,6 +108,25 @@ func _level_node() -> Node:
 	return node
 
 
+## Every Room in the same level.
+func _level_rooms() -> Array[Room]:
+	var rooms: Array[Room] = []
+	var level := _level_node()
+	if level:
+		for node in level.find_children("*", "Node2D", true, false):
+			if node is Room:
+				rooms.append(node)
+	return rooms
+
+
+## Whether two points are inside the same room.
+func _same_room(rooms: Array[Room], a: Vector2, b: Vector2) -> bool:
+	for room in rooms:
+		if room.contains(a):
+			return room.contains(b)
+	return false
+
+
 ## Every gas zone in the same level, including this one.
 func _level_zones() -> Array[GasZone]:
 	var zones: Array[GasZone] = []
@@ -148,6 +167,7 @@ func _refresh() -> void:
 	var area := rect()
 	var neighbours := _level_zones().filter(func(zone: GasZone) -> bool:
 		return zone != self and zone.rect().intersects(area.grow(1.0)))
+	var rooms := _level_rooms()
 	var texels := Vector2i(maxi(1, ceili(size.x / MASK_STEP)), maxi(1, ceili(size.y / MASK_STEP)))
 	var mask := Image.create(texels.x, texels.y, false, Image.FORMAT_L8)
 	var value := _strength_density()
@@ -157,7 +177,8 @@ func _refresh() -> void:
 			var point := area.position + local
 			var density := value
 			var fade := 1.0
-			# Each side: blend toward the zone across it, or fade out if nothing is there.
+			# Each side: blend toward the zone across it. With no zone there, fade out only if the
+			# other side is open floor of the same room; at a wall the gas stays thick.
 			var sides := [
 				[local.x, Vector2(area.position.x - 1.0, point.y)],
 				[size.x - local.x, Vector2(area.end.x + 1.0, point.y)],
@@ -172,7 +193,7 @@ func _refresh() -> void:
 						# Half way to the neighbour's density at the edge, where the neighbour
 						# does the same from its side, so both meet at the same value.
 						density += (across - value) * 0.5 * (1.0 - smoothstep(0.0, settings.blend_width, distance))
-				elif settings.edge_fade > 0.0:
+				elif settings.edge_fade > 0.0 and _same_room(rooms, point, side[1]):
 					fade = minf(fade, smoothstep(0.0, settings.edge_fade, distance))
 			mask.set_pixel(x, y, Color(clampf(density * fade, 0.0, 1.0), 0.0, 0.0))
 	_sprite.texture = ImageTexture.create_from_image(mask)

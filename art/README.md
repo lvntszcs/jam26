@@ -67,7 +67,7 @@ breaks into ragged wisps instead of fading evenly. Everything about its look is 
 | `swirl_speed`, `warp` | How fast the billows change shape, and how strongly they curl into each other. |
 | `edge_breakup`, `edge_softness` | How ragged thin gas looks (0 = plain fade), and how soft those ragged edges are. |
 | `blend_width` | Width over which touching zones of different strengths blend into each other. Only the look blends; the danger switches right at the edge. |
-| `edge_fade` | Width of a soft fade on zone edges that don't touch another zone. 0 (the default) fills zones right up to those edges. |
+| `edge_fade` | Width of a soft fade on zone edges that face open floor. Edges against a wall or another zone never fade, so there are no gaps there. |
 | `low_density`, `medium_density`, `strong_density` | How thick each gas strength looks. This is also how dangerous it is. |
 | `clear_speed` | How fast a running vent clears its room's gas, and how fast it returns. |
 

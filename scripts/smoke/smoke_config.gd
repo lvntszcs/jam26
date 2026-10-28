@@ -44,9 +44,9 @@ const DEFAULT_PATH := "res://config/smoke.tres"
 ## Width in world pixels over which touching zones of different strengths blend into each
 ## other. Only changes the look: the danger switches right at the edge.
 @export var blend_width := 200.0
-## Width in world pixels of a soft fade on zone edges that don't touch another zone.
-## Only changes the look.
-@export var edge_fade := 0.0
+## Width in world pixels of a soft fade on zone edges that face open floor (not another zone
+## or a wall). Only changes the look.
+@export var edge_fade := 150.0
 ## How fast a running vent clears its room's gas, and how fast the gas returns once it stops:
 ## the fraction of the gas cleared per second (1 = one second).
 @export var clear_speed := 0.5
