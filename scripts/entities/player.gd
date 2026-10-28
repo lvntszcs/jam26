@@ -4,6 +4,8 @@ extends CharacterBody2D
 ## object in reach, and loses air while in a smoky room.
 
 signal air_changed(air: float, max_air: float)
+## Actual air lost to smoke during this simulation tick (never emitted for recovery).
+signal tick_damage(amount: float)
 signal died
 
 @export var speed := 300.0
@@ -27,6 +29,7 @@ var facing := Vector2.DOWN
 var air := 0.0
 var is_active := true
 var _walk_time := 0.0
+var _step_distance := 0.0
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var camera: Camera2D = $Camera
@@ -50,7 +53,9 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity = velocity.move_toward(input * speed, acceleration * delta)
 		facing = input
+	var previous_position := global_position
 	move_and_slide()
+	_movement_feedback(global_position.distance_to(previous_position))
 	_animate(delta)
 	_breathe(delta)
 
@@ -61,6 +66,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _movement_feedback(distance: float) -> void:
+	# Distance, rather than held input, avoids footsteps while pushing against a wall.
+	if distance < 0.1:
+		_step_distance = 0.0
+	else:
+		_step_distance += distance
+		if _step_distance >= 65.0:
+			_step_distance = fmod(_step_distance, 65.0)
+			Haptics.pulse(0.12, 0.04, 0.035)
+
+
 func _breathe(delta: float) -> void:
 	var smoke := level.smoke_at(global_position)
 	var previous := air
@@ -69,6 +85,8 @@ func _breathe(delta: float) -> void:
 	else:
 		air += air_recovery_per_second * delta
 	air = clampf(air, 0.0, max_air)
+	if air < previous:
+		tick_damage.emit(previous - air)
 	if air != previous:
 		air_changed.emit(air, max_air)
 	if air <= 0.0:

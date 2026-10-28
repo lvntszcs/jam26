@@ -10,6 +10,7 @@ var _failures := 0
 
 
 func _ready() -> void:
+	_check_controller_bindings()
 	var main := MAIN_SCENE.instantiate()
 	var levels: Array[PackedScene] = main.levels
 	main.free()
@@ -17,6 +18,48 @@ func _ready() -> void:
 		await _check_level(scene)
 	print("level_check: %s" % ("OK" if _failures == 0 else "%d failure(s)" % _failures))
 	get_tree().quit(1 if _failures else 0)
+
+
+func _check_controller_bindings() -> void:
+	var actions := ["move_up", "move_down", "move_left", "move_right", "interact", "restart"]
+	var buttons := [JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_LEFT,
+		JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_A, JOY_BUTTON_Y]
+	for device_id in [0, 3]:
+		for i in actions.size():
+			var event := InputEventJoypadButton.new()
+			event.device = device_id
+			event.button_index = buttons[i]
+			event.pressed = true
+			_expect(InputMap.event_is_action(event, actions[i]), "controls",
+				"%s works on controller %d" % [actions[i], device_id])
+	for i in MOVES.size():
+		var event := InputEventJoypadMotion.new()
+		event.device = 3
+		event.axis = JOY_AXIS_LEFT_X if i < 2 else JOY_AXIS_LEFT_Y
+		event.axis_value = 1.0 if i % 2 == 0 else -1.0
+		_expect(InputMap.event_is_action(event, MOVES[i]), "controls", "%s uses left stick" % MOVES[i])
+	var hud: Hud = preload("res://scenes/ui/hud.tscn").instantiate()
+	add_child(hud)
+	hud.set_prompt("Open door")
+	var press := InputEventJoypadButton.new()
+	press.device = 3
+	press.pressed = true
+	Haptics._input(press)
+	_expect(hud.prompt_label.text == "[A] Open door", "controls", "controller updates prompt")
+	var drift := InputEventJoypadMotion.new()
+	drift.device = 4
+	drift.axis_value = 0.05
+	Haptics._input(drift)
+	_expect(Haptics.device == 3, "controls", "stick drift does not switch controller")
+	Haptics._on_joy_connection_changed(3, false)
+	_expect(Haptics.device == -1, "controls", "disconnect clears controller")
+	Haptics._input(press)
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_W
+	key.pressed = true
+	Haptics._input(key)
+	_expect(hud.prompt_label.text == "[E] Open door", "controls", "keyboard restores prompt")
+	hud.free()
 
 
 func _check_level(scene: PackedScene) -> void:
@@ -73,9 +116,45 @@ func _check_level(scene: PackedScene) -> void:
 		if level.player.global_position.distance_to(start) > 20.0:
 			break
 	_expect(level.player.global_position.distance_to(start) > 20.0, name, "player moves")
+	_check_damage_feedback(level, name)
 
 	remove_child(level)
 	level.free()
+
+
+func _check_damage_feedback(level: Level, level_name: String) -> void:
+	var player := level.player
+	player.global_position = level.rooms[0].rect().get_center()
+	player.air = player.max_air
+	level.rooms[0].smoke = 1.0
+	var damage: Array[float] = []
+	var events: Array[StringName] = []
+	var record_damage := func(amount: float) -> void: damage.append(amount)
+	var record_event := func(event_name: StringName) -> void: events.append(event_name)
+	player.tick_damage.connect(record_damage)
+	Haptics.event_triggered.connect(record_event)
+	Haptics.stop()
+	player._breathe(0.1)
+	_expect(damage.size() == 1 and is_equal_approx(damage[0], player.air_loss_per_second * 0.1),
+		level_name, "tick_damage reports actual air loss even above low-air threshold")
+	_expect(events == [Haptics.TICK_DAMAGE], level_name, "damage triggers named haptic event")
+	player._breathe(0.1)
+	_expect(damage.size() == 2 and events.size() == 1, level_name,
+		"continuous damage emits damage ticks but throttles haptic events")
+	level.rooms[0].smoke = 0.0
+	player._breathe(0.1)
+	_expect(damage.size() == 2 and events.size() == 1, level_name, "recovery emits no damage or haptic event")
+	Haptics._process(Haptics.DAMAGE_INTERVAL)
+	level.rooms[0].smoke = 1.0
+	player.air = 1.0
+	player._breathe(0.1)
+	_expect(damage.size() == 3 and is_equal_approx(damage[2], 1.0), level_name,
+		"lethal tick reports remaining air rather than unclamped damage")
+	_expect(events.size() == 2, level_name, "damage haptic resumes after cooldown")
+	_expect(not player.is_active and level.is_finished, level_name, "lethal damage still ends level")
+	player.tick_damage.disconnect(record_damage)
+	Haptics.event_triggered.disconnect(record_event)
+	Haptics.stop()
 
 
 func _reachable(level: Level, from: Room, to: Room) -> bool:

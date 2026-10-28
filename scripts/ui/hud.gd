@@ -9,6 +9,7 @@ extends CanvasLayer
 
 var _fill_style: StyleBoxFlat
 var _normal_fill_color: Color
+var _prompt := ""
 
 @onready var title_label: Label = %Title
 @onready var air_bar: ProgressBar = %AirBar
@@ -20,6 +21,7 @@ var _normal_fill_color: Color
 
 
 func _ready() -> void:
+	Haptics.device_changed.connect(_refresh_prompt)
 	var fill := air_bar.get_theme_stylebox("fill")
 	if fill is StyleBoxFlat:
 		_fill_style = fill.duplicate()
@@ -43,7 +45,13 @@ func set_air(air: float, max_air: float) -> void:
 
 
 func set_prompt(text: String) -> void:
-	prompt_label.text = "[E] %s" % text if text != "" else ""
+	_prompt = text
+	_refresh_prompt()
+
+
+func _refresh_prompt() -> void:
+	var button := "A" if Haptics.device >= 0 else "E"
+	prompt_label.text = "[%s] %s" % [button, _prompt] if _prompt != "" else ""
 
 
 func show_message(title: String, body: String) -> void:

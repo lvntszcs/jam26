@@ -19,6 +19,7 @@ func _ready() -> void:
 
 
 func load_level(index: int) -> void:
+	Haptics.stop()
 	if _level:
 		remove_child(_level)
 		_level.queue_free()
@@ -50,13 +51,13 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_level_completed() -> void:
 	if _index + 1 < levels.size():
 		_state = State.COMPLETED
-		hud.show_message("Sector cleared", "Press E to move on to the next sector.")
+		hud.show_message("Sector cleared", "Press E / A to move on to the next sector.")
 	else:
 		_state = State.FINISHED
-		hud.show_message("You escaped the island!", "The facility is behind you. Press E to play again.")
+		hud.show_message("You escaped the island!", "The facility is behind you. Press E / A to play again.")
 
 
 func _on_level_failed() -> void:
 	_state = State.FAILED
-	hud.show_message("You passed out", "The smoke was too thick. Press E or R to try again.")
+	hud.show_message("You passed out", "The smoke was too thick. Press E / A or R / Y to try again.")
 
