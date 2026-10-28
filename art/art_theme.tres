@@ -8,7 +8,8 @@
 [ext_resource type="Texture2D" path="res://art/placeholder/vent_off.png" id="10_voff"]
 [ext_resource type="Texture2D" path="res://art/placeholder/smoke_source.png" id="11_source"]
 [ext_resource type="Texture2D" path="res://art/placeholder/exit.png" id="12_exit"]
-[ext_resource type="Texture2D" path="res://art/placeholder/smoke.png" id="13_smoke"]
+[ext_resource type="Texture2D" path="res://art/placeholder/smoke_frame_1.png" id="13_smoke1"]
+[ext_resource type="Texture2D" path="res://art/placeholder/smoke_frame_2.png" id="16_smoke2"]
 [ext_resource type="Texture2D" path="res://art/placeholder/highlight.png" id="14_highlight"]
 
 [resource]
@@ -20,7 +21,5 @@ vent_on = ExtResource("9_von")
 vent_off = ExtResource("10_voff")
 smoke_source = ExtResource("11_source")
 exit = ExtResource("12_exit")
-smoke = ExtResource("13_smoke")
-smoke_tint = Color(0.588235, 0.145098, 0.992157, 1)
-smoke_max_alpha = 0.5
+smoke_frames = Array[Texture2D]([ExtResource("13_smoke1"), ExtResource("16_smoke2")])
 highlight = ExtResource("14_highlight")

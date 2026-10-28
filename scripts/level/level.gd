@@ -19,6 +19,8 @@ const PLAYER_SCENE := preload("res://scenes/entities/player.tscn")
 @export var door_flow := 0.5
 ## Local illumination for this level. Leave empty to use res://config/lighting.tres.
 @export var lighting: LightingConfig
+## How the smoke looks in this level. Leave empty to use res://config/smoke.tres.
+@export var smoke_config: SmokeConfig
 
 var player: Player
 var rooms: Array[Room] = []
@@ -40,6 +42,7 @@ func _ready() -> void:
 		object.setup(self, room_at(object.global_position))
 		if object.room == null and not object is Door:
 			push_warning("%s is not inside any room." % object.name)
+	_setup_smoke()
 	_spawn_player()
 	_setup_lighting()
 	_highlight = Sprite2D.new()
@@ -156,6 +159,15 @@ func _spawn_player() -> void:
 	player.camera.limit_right = int(area.end.x)
 	player.camera.limit_bottom = int(area.end.y)
 	player.camera.reset_smoothing()
+
+
+## Gives every room a SmokeSurface that draws its smoke.
+func _setup_smoke() -> void:
+	var config := smoke_config if smoke_config else SmokeConfig.load_default()
+	for room in rooms:
+		var surface := SmokeSurface.new()
+		surface.setup(self, room, config)
+		room.add_child(surface)
 
 
 ## Darkens the world with a CanvasModulate and gives the player's light its settings.

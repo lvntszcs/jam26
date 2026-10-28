@@ -66,7 +66,7 @@ func nearest_edge(point: Vector2) -> Dictionary:
 	return {"edge": edge, "along": along, "distance": distances[edge]}
 
 
-## Builds the wall colliders and the smoke overlay. Called by the Level after doors are linked.
+## Builds the wall colliders. Called by the Level after doors are linked.
 func build() -> void:
 	for edge: Edge in Edge.values():
 		var horizontal := edge == Edge.TOP or edge == Edge.BOTTOM
@@ -79,9 +79,6 @@ func build() -> void:
 		for span in spans:
 			if span.y - span.x > 1.0:
 				_add_wall(edge, span)
-	var overlay := SmokeOverlay.new()
-	overlay.room = self
-	add_child(overlay)
 
 
 func _cut(spans: Array[Vector2], from: float, to: float) -> Array[Vector2]:
