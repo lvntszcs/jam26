@@ -1,21 +1,23 @@
-[gd_resource type="Resource" script_class="ArtTheme" format=3]
+[gd_resource type="Resource" script_class="ArtTheme" format=3 uid="uid://c0xi3lhoqlkv1"]
 
-[ext_resource type="Script" path="res://scripts/core/art_theme.gd" id="1_theme"]
-[ext_resource type="Texture2D" path="res://art/characters/player_sheet.webp" id="4_psheet"]
-[ext_resource type="Texture2D" path="res://art/characters/player_crawl_sheet.webp" id="5_pcrawl"]
-[ext_resource type="Texture2D" path="res://art/rooms/room_floor.webp" id="15_room"]
-[ext_resource type="Texture2D" path="res://art/placeholder/door_closed.png" id="7_dclosed"]
-[ext_resource type="Texture2D" path="res://art/placeholder/door_open.png" id="8_dopen"]
-[ext_resource type="Texture2D" path="res://art/placeholder/vent_on.png" id="9_von"]
-[ext_resource type="Texture2D" path="res://art/placeholder/vent_off.png" id="10_voff"]
-[ext_resource type="Texture2D" path="res://art/placeholder/exit.png" id="12_exit"]
-[ext_resource type="Texture2D" path="res://art/placeholder/highlight.png" id="14_highlight"]
+[ext_resource type="Script" uid="uid://cff1jjpsgrb65" path="res://scripts/core/art_theme.gd" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://dujg1fu72wh6a" path="res://art/characters/player_sheet.webp" id="4_psheet"]
+[ext_resource type="Texture2D" uid="uid://bo6odkpbahp3" path="res://art/characters/player_crawl_sheet.webp" id="5_pcrawl"]
+[ext_resource type="Texture2D" uid="uid://ddxeer2igqf6i" path="res://art/placeholder/door_closed.png" id="7_dclosed"]
+[ext_resource type="Texture2D" uid="uid://dqb108jj45hx6" path="res://art/placeholder/door_open.png" id="8_dopen"]
+[ext_resource type="Texture2D" uid="uid://bgeu6jsi0rlei" path="res://art/placeholder/vent_on.png" id="9_von"]
+[ext_resource type="Texture2D" uid="uid://biwd4b011fd18" path="res://art/placeholder/vent_off.png" id="10_voff"]
+[ext_resource type="Texture2D" uid="uid://cb20g80xerobo" path="res://art/placeholder/exit.png" id="12_exit"]
+[ext_resource type="Texture2D" uid="uid://cuq5f08hayljg" path="res://art/placeholder/highlight.png" id="14_highlight"]
+[ext_resource type="Texture2D" uid="uid://csoyvl4s38dq7" path="res://art/rooms/room_floor.webp" id="15_room"]
 
 [resource]
 script = ExtResource("1_theme")
 room_background = ExtResource("15_room")
 player_sheet = ExtResource("4_psheet")
+player_walk_frames = PackedInt32Array(0, 1, 2, 3)
 player_crawl_sheet = ExtResource("5_pcrawl")
+player_crawl_frames = PackedInt32Array(0, 1, 2, 1)
 door_closed = ExtResource("7_dclosed")
 door_open = ExtResource("8_dopen")
 vent_on = ExtResource("9_von")

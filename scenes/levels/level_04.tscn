@@ -6,13 +6,13 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="5_o3rdr"]
 [ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="9_sibhc"]
 [ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="11_fy4m5"]
-[ext_resource type="Texture2D" path="res://art/rooms/computer_room.webp" id="14_computerart"]
-[ext_resource type="Texture2D" path="res://art/rooms/switch_room.webp" id="15_switchart"]
-[ext_resource type="Texture2D" path="res://art/rooms/vent_duct.webp" id="16_ductart"]
-[ext_resource type="Texture2D" path="res://art/rooms/control_room.webp" id="17_controlart"]
-[ext_resource type="Texture2D" path="res://art/rooms/north_maze.webp" id="18_northart"]
-[ext_resource type="Texture2D" path="res://art/rooms/west_maze.webp" id="19_westart"]
-[ext_resource type="Texture2D" path="res://art/rooms/south_maze.webp" id="20_southart"]
+[ext_resource type="Texture2D" uid="uid://bm1vbwm0a4mua" path="res://art/rooms/computer_room.webp" id="14_computerart"]
+[ext_resource type="Texture2D" uid="uid://nf145q2ysw6k" path="res://art/rooms/switch_room.webp" id="15_switchart"]
+[ext_resource type="Texture2D" uid="uid://dfwbfbhlosxdh" path="res://art/rooms/vent_duct.webp" id="16_ductart"]
+[ext_resource type="Texture2D" uid="uid://bghb5w5c7b6ir" path="res://art/rooms/control_room.webp" id="17_controlart"]
+[ext_resource type="Texture2D" uid="uid://36c470vx1eib" path="res://art/rooms/north_maze.webp" id="18_northart"]
+[ext_resource type="Texture2D" uid="uid://dkyautgjnmxgg" path="res://art/rooms/west_maze.webp" id="19_westart"]
+[ext_resource type="Texture2D" uid="uid://dqdve532c4xok" path="res://art/rooms/south_maze.webp" id="20_southart"]
 [ext_resource type="Script" uid="uid://d4r8q4so8tex" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 
 [node name="Level" type="Node2D" unique_id=1452852674]
@@ -68,7 +68,7 @@ room_name = "Switch Room"
 size = Vector2(1040, 1040)
 background = ExtResource("15_switchart")
 
-[node name="SwitchPassage" parent="Rooms" instance=ExtResource("2_tdc43")]
+[node name="SwitchPassage" parent="Rooms" unique_id=1635273087 instance=ExtResource("2_tdc43")]
 position = Vector2(1678, 2950)
 room_name = "Switch Passage"
 size = Vector2(422, 250)
@@ -178,7 +178,7 @@ position = Vector2(5281, 2800)
 stretch_art = true
 solid = false
 
-[node name="Door14" parent="Doors" instance=ExtResource("5_o3rdr")]
+[node name="Door14" parent="Doors" unique_id=1755983486 instance=ExtResource("5_o3rdr")]
 position = Vector2(1678, 3075)
 start_open = true
 stretch_art = true
@@ -186,151 +186,145 @@ solid = false
 
 [node name="Gas" type="Node2D" parent="." unique_id=1058568288]
 
-[node name="ControlRoomGas" type="Node2D" parent="Gas"]
+[node name="ControlRoomGas" type="Node2D" parent="Gas" unique_id=316923340]
 position = Vector2(343, -388)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(1414, 1000)
 
-[node name="NorthMazeTopGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeTopGas" type="Node2D" parent="Gas" unique_id=1806701334]
 position = Vector2(-584, 612)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(2834, 460)
 
-[node name="NorthMazeWestGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeWestGas" type="Node2D" parent="Gas" unique_id=1520662394]
 position = Vector2(-584, 1072)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(304, 394)
 
-[node name="NorthMazeMediumGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeMediumGas" type="Node2D" parent="Gas" unique_id=1916068302]
 position = Vector2(-280, 1072)
 script = ExtResource("gas_zone")
-strength = 1
 size = Vector2(810, 394)
 
-[node name="NorthMazeEastGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeEastGas" type="Node2D" parent="Gas" unique_id=543446274]
 position = Vector2(529, 1072)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(1721, 690)
 
-[node name="NorthMazeSouthWestGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeSouthWestGas" type="Node2D" parent="Gas" unique_id=1372051597]
 position = Vector2(-584, 1466)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(709, 1018)
 
-[node name="NorthMazeMediumStripGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeMediumStripGas" type="Node2D" parent="Gas" unique_id=514922954]
 position = Vector2(125, 1466)
 script = ExtResource("gas_zone")
-strength = 1
 size = Vector2(405, 1018)
 
-[node name="NorthMazeMediumBandGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeMediumBandGas" type="Node2D" parent="Gas" unique_id=310448331]
 position = Vector2(529, 1762)
 script = ExtResource("gas_zone")
-strength = 1
 size = Vector2(911, 197)
 
-[node name="NorthMazeSouthEastGas" type="Node2D" parent="Gas"]
+[node name="NorthMazeSouthEastGas" type="Node2D" parent="Gas" unique_id=41801129]
 position = Vector2(1440, 1762)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(810, 722)
 
-[node name="SwitchCorridorGas" type="Node2D" parent="Gas"]
+[node name="SwitchCorridorGas" type="Node2D" parent="Gas" unique_id=1847595578]
 position = Vector2(529, 1958)
 script = ExtResource("gas_zone")
 strength = 0
 size = Vector2(911, 526)
 
-[node name="WestMazeGas" type="Node2D" parent="Gas"]
+[node name="WestMazeGas" type="Node2D" parent="Gas" unique_id=1733810196]
 position = Vector2(-584, 2484)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(429, 470)
 
-[node name="WestMazeMediumGas" type="Node2D" parent="Gas"]
+[node name="WestMazeMediumGas" type="Node2D" parent="Gas" unique_id=2055231455]
 position = Vector2(-155, 2484)
 script = ExtResource("gas_zone")
-strength = 1
 size = Vector2(429, 470)
 
-[node name="WestMazeSouthGas" type="Node2D" parent="Gas"]
+[node name="WestMazeSouthGas" type="Node2D" parent="Gas" unique_id=1663679582]
 position = Vector2(-584, 2954)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(858, 570)
 
-[node name="SouthMazeTopGas" type="Node2D" parent="Gas"]
+[node name="SouthMazeTopGas" type="Node2D" parent="Gas" unique_id=51262020]
 position = Vector2(-584, 3524)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(2262, 214)
 
-[node name="SouthMazeWestGas" type="Node2D" parent="Gas"]
+[node name="SouthMazeWestGas" type="Node2D" parent="Gas" unique_id=653592848]
 position = Vector2(-584, 3738)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(565, 826)
 
-[node name="SouthMazeMediumGas" type="Node2D" parent="Gas"]
+[node name="SouthMazeMediumGas" type="Node2D" parent="Gas" unique_id=444554109]
 position = Vector2(-19, 3738)
 script = ExtResource("gas_zone")
-strength = 1
 size = Vector2(1413, 240)
 
-[node name="SouthMazeEastGas" type="Node2D" parent="Gas"]
+[node name="SouthMazeEastGas" type="Node2D" parent="Gas" unique_id=543170556]
 position = Vector2(1396, 3738)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(282, 826)
 
-[node name="SouthMazeBottomGas" type="Node2D" parent="Gas"]
+[node name="SouthMazeBottomGas" type="Node2D" parent="Gas" unique_id=1531040904]
 position = Vector2(-19, 3978)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(1413, 586)
 
-[node name="ComputerRoomLowGas" type="Node2D" parent="Gas"]
+[node name="ComputerRoomLowGas" type="Node2D" parent="Gas" unique_id=1941845532]
 position = Vector2(2850, 1150)
 script = ExtResource("gas_zone")
 strength = 0
 size = Vector2(850, 650)
 
-[node name="ComputerRoomEastLowGas" type="Node2D" parent="Gas"]
+[node name="ComputerRoomEastLowGas" type="Node2D" parent="Gas" unique_id=1280095542]
 position = Vector2(3700, 1150)
 script = ExtResource("gas_zone")
 strength = 0
 size = Vector2(450, 575)
 
-[node name="ComputerRoomMediumGas" type="Node2D" parent="Gas"]
+[node name="ComputerRoomMediumGas" type="Node2D" parent="Gas" unique_id=1268480575]
 position = Vector2(3700, 1725)
 script = ExtResource("gas_zone")
-strength = 1
 size = Vector2(450, 375)
 
-[node name="ComputerRoomGas" type="Node2D" parent="Gas"]
+[node name="ComputerRoomGas" type="Node2D" parent="Gas" unique_id=1485819434]
 position = Vector2(2250, 1800)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(1450, 650)
 
-[node name="ComputerRoomEastGas" type="Node2D" parent="Gas"]
+[node name="ComputerRoomEastGas" type="Node2D" parent="Gas" unique_id=359104931]
 position = Vector2(3700, 2100)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(450, 350)
 
-[node name="AirlockGas" type="Node2D" parent="Gas"]
+[node name="AirlockGas" type="Node2D" parent="Gas" unique_id=1129986150]
 position = Vector2(3050, 2450)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(400, 300)
 
-[node name="LabRoomLowGas" type="Node2D" parent="Gas"]
+[node name="LabRoomLowGas" type="Node2D" parent="Gas" unique_id=333467712]
 position = Vector2(3075, 2750)
 script = ExtResource("gas_zone")
 strength = 0
