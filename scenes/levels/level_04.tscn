@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="5_o3rdr"]
 [ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="9_sibhc"]
 [ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="11_fy4m5"]
-[ext_resource type="Texture2D" path="res://art/rooms/computer_room.jpg" id="14_computerart"]
+[ext_resource type="Texture2D" path="res://art/rooms/computer_room.webp" id="14_computerart"]
 [ext_resource type="Texture2D" path="res://art/rooms/switch_room.webp" id="15_switchart"]
 [ext_resource type="Script" uid="uid://d4r8q4so8tex" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 
