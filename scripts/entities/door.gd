@@ -17,6 +17,8 @@ const DIM_SPEED := 8.0
 		start_open = value
 		is_open = value
 		refresh_visual()
+## Keycard level needed to open this door; 0 = anyone can. Once opened it stays unlocked.
+@export_range(0, 9) var required_keycard := 0
 ## True for a door in a vertical wall. The Level corrects this from the door's position at runtime.
 @export var vertical := false:
 	set(value):
@@ -50,12 +52,28 @@ func current_texture() -> Texture2D:
 
 
 func interaction_prompt() -> String:
-	return "Close door" if is_open else "Open door"
+	if is_open:
+		return "Close door"
+	if is_locked():
+		var player := level.player if level else null
+		if player == null or player.keycard_level < required_keycard:
+			return "Locked: needs keycard level %d" % required_keycard
+		return "Unlock door with keycard"
+	return "Open door"
+
+
+func is_locked() -> bool:
+	return required_keycard > 0
 
 
 func interact(by: Player) -> void:
 	if is_open and _overlaps(by):
 		return
+	if not is_open and is_locked():
+		if by.keycard_level < required_keycard:
+			Haptics.pulse(0.6, 0.1, 0.18, 2)
+			return
+		required_keycard = 0
 	is_open = not is_open
 	_blocker_shape.set_deferred("disabled", is_open)
 	_occluder.visible = not is_open

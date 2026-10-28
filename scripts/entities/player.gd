@@ -7,6 +7,8 @@ signal air_changed(air: float, max_air: float)
 ## Actual air lost to smoke during this simulation tick (never emitted for recovery).
 signal tick_damage(amount: float)
 signal died
+## The keycard's level changed (0 = no keycard).
+signal keycard_changed(keycard_level: int)
 
 @export var speed := 300.0
 @export var acceleration := 2400.0
@@ -33,6 +35,9 @@ var level: Level
 var facing := Vector2.DOWN
 var air := 0.0
 var is_active := true
+## Level of the keycard the player carries; 0 = none. Doors check it against their
+## `required_keycard`.
+var keycard_level := 0
 var _walk_time := 0.0
 var _step_distance := 0.0
 var _footstep_index := 0
@@ -85,6 +90,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		noclip = not noclip
 		_refresh_cheat_tint()
 		get_viewport().set_input_as_handled()
+
+
+func set_keycard_level(value: int) -> void:
+	if value != keycard_level:
+		keycard_level = value
+		keycard_changed.emit(keycard_level)
+
+
+## Raises the keycard one level, e.g. at an upgrade station. Does nothing without a keycard.
+func upgrade_keycard() -> void:
+	if keycard_level > 0:
+		set_keycard_level(keycard_level + 1)
 
 
 ## Lime tint = god mode, violet = noclip, a blend of both when both are on.
