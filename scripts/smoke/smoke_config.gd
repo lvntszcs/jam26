@@ -4,8 +4,9 @@ extends Resource
 ## How the smoke looks and spreads on screen. The default is res://config/smoke.tres, and a
 ## Level can use its own through its `smoke_config` property. The smoke art itself (the
 ## tileable animation frames) is `smoke_frames` in res://art/art_theme.tres.
-## These settings only change the visuals: how much smoke a room holds, and how dangerous it
-## is, is decided by the smoke sources, vents and doors.
+## Apart from `spread_speed` and `cell_size` (smoke passes a door once it has spread up to it),
+## these settings only change the visuals: how much smoke a room holds is decided by the smoke
+## sources, vents and doors.
 
 const DEFAULT_PATH := "res://config/smoke.tres"
 
@@ -47,8 +48,9 @@ enum AlphaSource {
 @export_group("Spread")
 ## Size of one cell of the on-screen density grid, in world pixels. Smaller = finer detail.
 @export var cell_size := 50.0
-## How fast smoke spreads across a room from where it comes in.
-@export var spread_speed := 6.0
+## How fast smoke spreads across a room from where it comes in. Doors only let smoke through
+## once it has spread up to them, so this also sets how soon smoke reaches the next room.
+@export var spread_speed := 40.0
 ## How quickly the drawn amount of smoke catches up with the room's actual smoke level.
 @export var fill_speed := 2.0
 

@@ -15,5 +15,5 @@ edge_breakup = 0.7
 edge_softness = 0.3
 edge_mask_size = 700.0
 cell_size = 50.0
-spread_speed = 6.0
+spread_speed = 40.0
 fill_speed = 2.0

@@ -4,7 +4,10 @@ extends Sprite2D
 ## where it comes in (smoke sources, open doors from smokier rooms) and removed where it leaves
 ## (running vents, open doors to cleaner rooms), then spreads cell to cell. The grid's total
 ## follows the room's gameplay smoke level, so it only changes where the smoke is drawn,
-## not how much there is. The grid is drawn by smoke.gdshader with the ArtTheme's smoke frames.
+## not how much there is. Doors only pass smoke once the grid's smoke has spread up to them
+## (see Level.doorway_smoke), so smoke never shows up in the next room before reaching the door.
+## The Level steps the grid together with the gameplay smoke. The grid is drawn by
+## smoke.gdshader with the ArtTheme's smoke frames.
 ## Created by the Level, so it isn't saved in any scene.
 
 const SHADER := preload("res://scripts/smoke/smoke.gdshader")
@@ -63,14 +66,18 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	_simulate(delta)
 	_upload()
 	_animate(delta)
 
 
+## How thick the drawn smoke is at a point in the room (0 to 1).
+func density_at(point: Vector2) -> float:
+	return _cells[_cell_at(point)]
+
+
 ## Moves the grid's total toward the room's smoke level at the entry or exit points,
 ## then lets it spread.
-func _simulate(delta: float) -> void:
+func simulate(delta: float) -> void:
 	var mean := 0.0
 	for value in _cells:
 		mean += value
@@ -85,7 +92,11 @@ func _simulate(delta: float) -> void:
 			var per_point := change * _cells.size() / points.size()
 			for i in points:
 				_cells[i] = clampf(_cells[i] + per_point, 0.0, 1.0)
-	_spread(minf(1.0, config.spread_speed * delta))
+	# Spreading more than one cell's worth per step is unstable, so fast spreading takes substeps.
+	var amount := config.spread_speed * delta
+	var steps := maxi(1, ceili(amount))
+	for step in steps:
+		_spread(amount / steps)
 
 
 func _spread(rate: float) -> void:

@@ -93,7 +93,7 @@ Level node's **Smoke Config**):
 | `drift` | Slow slide of the texture, in world pixels per second. |
 | `edge_breakup`, `edge_softness` | How ragged thin smoke looks (0 = plain fade), and how soft those ragged edges are. |
 | `edge_mask_size` | World size of one repeat of the edge mask. Larger = bigger, calmer billows. |
-| `cell_size`, `spread_speed`, `fill_speed` | How finely and how fast smoke visibly creeps in from doors and sources and gets pulled toward vents. |
+| `cell_size`, `spread_speed`, `fill_speed` | How finely and how fast smoke visibly creeps in from doors and sources and gets pulled toward vents. Smoke only passes a door once it has spread up to it, so `spread_speed` also sets how soon it reaches the next room. |
 
 These only change how the smoke looks. How much smoke a room holds, and how dangerous it is,
 are set by the smoke sources, vents and doors in the level.
