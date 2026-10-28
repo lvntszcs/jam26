@@ -33,12 +33,11 @@ const ACTIVE_PATH := "res://art/art_theme.tres"
 @export var exit: Texture2D
 
 @export_group("Effects")
-## One smoke puff. Keep it white/grey and set the color with smoke_tint,
-## or paint it in color and set smoke_tint to white.
-@export var smoke: Texture2D
-@export var smoke_tint := Palette.VIOLET
-## Opacity of a single puff in a room full of smoke. Puffs overlap, so keep this low.
-@export_range(0.0, 1.0) var smoke_max_alpha := 0.5
+## Animation frames of the smoke, played in order and looped. Each frame must tile seamlessly
+## (its left edge continues its right edge, and its top continues its bottom), and all frames
+## should be the same size. Color, size on screen, speed and edges are set in
+## res://config/smoke.tres.
+@export var smoke_frames: Array[Texture2D] = []
 ## Drawn around the object the player can interact with.
 @export var highlight: Texture2D
 

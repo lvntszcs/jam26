@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SmokeConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/smoke/smoke_config.gd" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+tint = Color(0.588235, 0.145098, 0.992157, 1)
+opacity = 0.85
+tile_size = 360.0
+alpha_source = 0
+frame_rate = 3.0
+crossfade = 0.25
+drift = Vector2(14, -8)
+edge_breakup = 0.7
+edge_softness = 0.25
+cell_size = 50.0
+spread_speed = 6.0
+fill_speed = 2.0
