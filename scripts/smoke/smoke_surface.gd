@@ -50,6 +50,7 @@ func _ready() -> void:
 	shader_material.shader = SHADER
 	shader_material.set_shader_parameter("tint", config.tint)
 	shader_material.set_shader_parameter("opacity", config.opacity)
+	shader_material.set_shader_parameter("thickness", config.thickness)
 	shader_material.set_shader_parameter("tile_size", config.tile_size)
 	shader_material.set_shader_parameter("drift", config.drift)
 	shader_material.set_shader_parameter("luminance_as_alpha", config.alpha_source == SmokeConfig.AlphaSource.LUMINANCE)

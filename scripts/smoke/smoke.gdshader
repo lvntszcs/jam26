@@ -15,6 +15,8 @@ uniform float edge_mask_size = 300.0;
 uniform float blend : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 tint : source_color = vec4(1.0);
 uniform float opacity : hint_range(0.0, 1.0) = 0.85;
+// Multiplies the frames' own opacity.
+uniform float thickness : hint_range(0.0, 4.0) = 1.0;
 uniform float tile_size = 360.0;
 uniform vec2 drift = vec2(0.0);
 uniform bool luminance_as_alpha = false;
@@ -42,7 +44,7 @@ void fragment() {
 	// nothing shows) to below the lowest (density 1: the whole texture shows).
 	float threshold = mix(1.0 + edge_softness, -edge_softness, density);
 	float ragged = smoothstep(threshold - edge_softness, threshold + edge_softness, coverage);
-	float alpha = body * mix(density, ragged, edge_breakup) * opacity * tint.a;
+	float alpha = min(1.0, body * thickness) * mix(density, ragged, edge_breakup) * opacity * tint.a;
 
 	vec3 color = luminance_as_alpha ? vec3(1.0) : smoke.rgb;
 	COLOR = vec4(color * tint.rgb, alpha);

@@ -92,7 +92,7 @@ Level node's **Smoke Config**):
 
 | Setting | Effect |
 |---------|--------|
-| `tint`, `opacity` | Color, and how opaque a completely full room is. |
+| `tint`, `opacity`, `thickness` | Color, how opaque a completely full room is, and a multiplier on the frames' own opacity (raise it if the smoke looks see-through). |
 | `tile_size` | World size of one texture repeat (a room is about 1000 wide). |
 | `alpha_source` | Read thickness from the frames' transparency or brightness. |
 | `frame_rate` | Frames per second. |
