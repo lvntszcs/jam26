@@ -30,6 +30,7 @@ var _walk_time := 0.0
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var camera: Camera2D = $Camera
+@onready var light: PlayerLight = $Light
 @onready var radius: float = ($Collision.shape as CircleShape2D).radius
 
 

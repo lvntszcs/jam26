@@ -47,6 +47,24 @@ level, in world pixels), keeping the aspect ratio. Doors stretch to fill theirs.
 | `smoke` | One soft puff. Rooms are covered in drifting puffs whose opacity follows the room's smoke level. Keep it **white or grey** and set the color with `smoke_tint`, or paint it in color and set `smoke_tint` to white. `smoke_max_alpha` sets how thick a full room looks. |
 | `highlight` | Stretched around whatever the player can interact with. |
 
+## Lighting
+
+Only the area around the player is lit. All settings are in **`config/lighting.tres`**. Open it
+in the inspector:
+
+| Setting | Effect |
+|---------|--------|
+| `enabled` | Turn the darkness off entirely (handy while building levels). |
+| `darkness` | Tint of everything outside the light. Black hides it completely, and a lighter color leaves rooms faintly visible. |
+| `radius` | Size of the lit circle in world pixels (a room is about 1000 wide). |
+| `softness` | 0 = hard edge, 1 = fades out from the centre. |
+| `color` / `energy` | Light color and brightness. Raising `energy` above 1 washes out the art. |
+| `flicker_amount` / `flicker_speed` | Torch-like wobble. Set the amount to 0 for a steady light. |
+| `shadows`, `shadow_color`, `shadow_smooth` | Walls and closed doors block the light, so you can't see into other rooms. |
+
+To give one level different lighting (e.g. a darker final level), duplicate the file and assign
+it to the Level node's **Lighting** property.
+
 ## Filtering
 
 The project uses smooth (linear) texture filtering, which suits painted art. For pixel art,

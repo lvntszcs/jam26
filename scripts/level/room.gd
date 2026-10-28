@@ -118,6 +118,10 @@ func _add_wall(edge: Edge, span: Vector2) -> void:
 	shape.position = wall_rect.get_center()
 	body.add_child(shape)
 	add_child(body)
+	# Walls block the player's light so neighbouring rooms stay dark.
+	var occluder := LightOccluder2D.new()
+	occluder.occluder = Lighting.rect_occluder(wall_rect)
+	add_child(occluder)
 
 
 func _draw() -> void:
