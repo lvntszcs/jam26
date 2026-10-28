@@ -1,0 +1,103 @@
+class_name Player
+extends CharacterBody2D
+## Free-moving top-down player. Walks with smooth acceleration, interacts with the nearest
+## object in reach, and loses air while in a smoky room.
+
+signal air_changed(air: float, max_air: float)
+signal died
+
+@export var speed := 300.0
+@export var acceleration := 2400.0
+@export var friction := 2800.0
+## Size in world pixels that one spritesheet frame is fitted into.
+@export var footprint := Vector2(110, 110)
+## How quickly the sprite turns toward the walking direction (higher = snappier).
+@export var turn_speed := 14.0
+## How close (from the player's centre) an object must be to interact with it.
+@export var interact_range := 120.0
+@export var max_air := 100.0
+## Air lost per second in a room full of smoke.
+@export var air_loss_per_second := 30.0
+@export var air_recovery_per_second := 15.0
+## Smoke below this level is safe to breathe.
+@export_range(0.0, 1.0) var safe_smoke := 0.2
+
+var level: Level
+var facing := Vector2.DOWN
+var air := 0.0
+var is_active := true
+var _walk_time := 0.0
+
+@onready var sprite: Sprite2D = $Sprite
+@onready var camera: Camera2D = $Camera
+@onready var radius: float = ($Collision.shape as CircleShape2D).radius
+
+
+func _ready() -> void:
+	air = max_air
+	_setup_sprite()
+	air_changed.emit(air, max_air)
+
+
+func _physics_process(delta: float) -> void:
+	if not is_active:
+		velocity = Vector2.ZERO
+		return
+	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if input == Vector2.ZERO:
+		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+	else:
+		velocity = velocity.move_toward(input * speed, acceleration * delta)
+		facing = input
+	move_and_slide()
+	_animate(delta)
+	_breathe(delta)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if is_active and event.is_action_pressed("interact"):
+		level.interact(self)
+		get_viewport().set_input_as_handled()
+
+
+func _breathe(delta: float) -> void:
+	var smoke := level.smoke_at(global_position)
+	var previous := air
+	if smoke > safe_smoke:
+		air -= air_loss_per_second * smoke * delta
+	else:
+		air += air_recovery_per_second * delta
+	air = clampf(air, 0.0, max_air)
+	if air != previous:
+		air_changed.emit(air, max_air)
+	if air <= 0.0:
+		is_active = false
+		died.emit()
+
+
+func _setup_sprite() -> void:
+	var art := ArtTheme.active()
+	sprite.texture = art.player_sheet
+	sprite.hframes = art.player_sheet_columns
+	sprite.vframes = art.player_sheet_rows
+	sprite.frame = art.player_idle_frame
+	if art.player_sheet:
+		var frame_size := art.player_sheet.get_size() / Vector2(art.player_sheet_columns, art.player_sheet_rows)
+		var fit := footprint / frame_size
+		sprite.scale = Vector2.ONE * minf(fit.x, fit.y)
+	sprite.rotation = facing.angle() - deg_to_rad(art.player_art_angle)
+
+
+## Turns the sprite toward the walking direction and steps through the walk cycle at a rate
+## that follows the current speed, so the feet don't slide.
+func _animate(delta: float) -> void:
+	var art := ArtTheme.active()
+	var target := facing.angle() - deg_to_rad(art.player_art_angle)
+	sprite.rotation = lerp_angle(sprite.rotation, target, minf(1.0, turn_speed * delta))
+	var pace := velocity.length() / speed
+	if pace < 0.1 or art.player_walk_frames.is_empty():
+		_walk_time = 0.0
+		sprite.frame = art.player_idle_frame
+		return
+	_walk_time += delta * art.player_walk_fps * pace
+	sprite.frame = art.player_walk_frames[int(_walk_time) % art.player_walk_frames.size()]

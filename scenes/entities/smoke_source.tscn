@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/smoke_source.gd" id="1_script"]
+
+[node name="SmokeSource" type="Node2D"]
+z_index = 1
+script = ExtResource("1_script")
+footprint = Vector2(120, 120)
+
+[node name="Sprite" type="Sprite2D" parent="."]

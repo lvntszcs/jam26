@@ -1,0 +1,121 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/rooms/room.tscn" id="room"]
+[ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="door"]
+[ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="vent"]
+[ext_resource type="PackedScene" path="res://scenes/entities/smoke_source.tscn" id="source"]
+[ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="exit"]
+[ext_resource type="Script" path="res://scripts/level/level.gd" id="script"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("script")
+title = "03 - Evacuation"
+hint = "Smoke follows every open door. Plan your route before you open the next one."
+camera_zoom = 0.9
+
+[node name="Rooms" type="Node2D" parent="."]
+
+[node name="Quarters" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(0, 0)
+room_name = "Quarters"
+size = Vector2(800, 600)
+
+[node name="ReactorLab" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(800, 0)
+room_name = "Reactor Lab"
+size = Vector2(800, 600)
+
+[node name="Archive" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(1600, 0)
+room_name = "Archive"
+size = Vector2(800, 600)
+
+[node name="Infirmary" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(0, 600)
+room_name = "Infirmary"
+size = Vector2(800, 600)
+
+[node name="Atrium" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(800, 600)
+room_name = "Atrium"
+size = Vector2(800, 600)
+
+[node name="Greenhouse" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(1600, 600)
+room_name = "Greenhouse"
+size = Vector2(800, 600)
+
+[node name="PumpRoom" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(800, 1200)
+room_name = "Pump Room"
+size = Vector2(800, 600)
+
+[node name="BoatDock" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(1600, 1200)
+room_name = "Boat Dock"
+size = Vector2(800, 600)
+
+[node name="Doors" type="Node2D" parent="."]
+
+[node name="Door1" parent="Doors" instance=ExtResource("door")]
+position = Vector2(800, 300)
+
+[node name="Door2" parent="Doors" instance=ExtResource("door")]
+position = Vector2(400, 600)
+
+[node name="Door3" parent="Doors" instance=ExtResource("door")]
+position = Vector2(1600, 300)
+
+[node name="Door4" parent="Doors" instance=ExtResource("door")]
+position = Vector2(1200, 600)
+start_open = true
+
+[node name="Door5" parent="Doors" instance=ExtResource("door")]
+position = Vector2(800, 900)
+start_open = true
+
+[node name="Door6" parent="Doors" instance=ExtResource("door")]
+position = Vector2(1600, 900)
+
+[node name="Door7" parent="Doors" instance=ExtResource("door")]
+position = Vector2(2000, 600)
+start_open = true
+
+[node name="Door8" parent="Doors" instance=ExtResource("door")]
+position = Vector2(1200, 1200)
+
+[node name="Door9" parent="Doors" instance=ExtResource("door")]
+position = Vector2(2000, 1200)
+start_open = true
+
+[node name="Door10" parent="Doors" instance=ExtResource("door")]
+position = Vector2(1600, 1500)
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="SmokeSource1" parent="Objects" instance=ExtResource("source")]
+position = Vector2(1200, 250)
+
+[node name="SmokeSource2" parent="Objects" instance=ExtResource("source")]
+position = Vector2(2000, 900)
+
+[node name="Vent1" parent="Objects" instance=ExtResource("vent")]
+position = Vector2(200, 1000)
+
+[node name="Vent2" parent="Objects" instance=ExtResource("vent")]
+position = Vector2(2250, 150)
+start_on = false
+
+[node name="Vent3" parent="Objects" instance=ExtResource("vent")]
+position = Vector2(1000, 1600)
+
+[node name="Vent4" parent="Objects" instance=ExtResource("vent")]
+position = Vector2(1800, 1650)
+start_on = false
+
+[node name="Exit1" parent="Objects" instance=ExtResource("exit")]
+position = Vector2(2200, 1450)
+footprint = Vector2(120, 120)
+
+[node name="PlayerStart" type="Marker2D" parent="."]
+position = Vector2(300, 300)

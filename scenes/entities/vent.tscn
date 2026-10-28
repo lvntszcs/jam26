@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/vent.gd" id="1_script"]
+
+[node name="Vent" type="Node2D"]
+z_index = 1
+script = ExtResource("1_script")
+footprint = Vector2(110, 110)
+
+[node name="Sprite" type="Sprite2D" parent="."]

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ArtTheme" format=3]
+
+[ext_resource type="Script" path="res://scripts/core/art_theme.gd" id="1_theme"]
+[ext_resource type="Texture2D" path="res://art/characters/player_sheet.webp" id="4_psheet"]
+[ext_resource type="Texture2D" path="res://art/placeholder/door_closed.png" id="7_dclosed"]
+[ext_resource type="Texture2D" path="res://art/placeholder/door_open.png" id="8_dopen"]
+[ext_resource type="Texture2D" path="res://art/placeholder/vent_on.png" id="9_von"]
+[ext_resource type="Texture2D" path="res://art/placeholder/vent_off.png" id="10_voff"]
+[ext_resource type="Texture2D" path="res://art/placeholder/smoke_source.png" id="11_source"]
+[ext_resource type="Texture2D" path="res://art/placeholder/exit.png" id="12_exit"]
+[ext_resource type="Texture2D" path="res://art/placeholder/smoke.png" id="13_smoke"]
+[ext_resource type="Texture2D" path="res://art/placeholder/highlight.png" id="14_highlight"]
+
+[resource]
+script = ExtResource("1_theme")
+player_sheet = ExtResource("4_psheet")
+door_closed = ExtResource("7_dclosed")
+door_open = ExtResource("8_dopen")
+vent_on = ExtResource("9_von")
+vent_off = ExtResource("10_voff")
+smoke_source = ExtResource("11_source")
+exit = ExtResource("12_exit")
+smoke = ExtResource("13_smoke")
+smoke_tint = Color(0.588235, 0.145098, 0.992157, 1)
+smoke_max_alpha = 0.5
+highlight = ExtResource("14_highlight")
