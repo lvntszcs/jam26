@@ -45,6 +45,12 @@ to the cleaner one (`door_flow` on the Level). Sources add smoke and running ven
 Bigger rooms fill and drain more slowly. Players lose air while their room's smoke is above
 their `safe_smoke` level.
 
+On screen, each room's smoke visibly enters where it comes in (sources, and open doors from
+smokier rooms), spreads across the room, and leaves through vents and doors to cleaner rooms.
+That spreading is visual only: the danger is still the room's single smoke level. To change how
+the smoke looks in one level, assign a copy of `config/smoke.tres` to the Level's
+**Smoke Config**.
+
 ## Adding a level
 
 1. Duplicate an existing level scene in `scenes/levels/`.

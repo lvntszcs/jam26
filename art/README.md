@@ -51,8 +51,46 @@ level, in world pixels), keeping the aspect ratio. Doors stretch to fill theirs.
 | `vent_on` / `vent_off` | A running vent spins its sprite. Set `spin_speed = 0` on the vent to stop that. |
 | `smoke_source` | Pulses. Set `pulse_amount = 0` to stop. |
 | `exit` | The escape hatch. |
-| `smoke` | One soft puff. Rooms are covered in drifting puffs whose opacity follows the room's smoke level. Keep it **white or grey** and set the color with `smoke_tint`, or paint it in color and set `smoke_tint` to white. `smoke_max_alpha` sets how thick a full room looks. |
+| `smoke_frames` | The smoke animation: tileable frames played in order and looped (see **Smoke** below). |
 | `highlight` | Stretched around whatever the player can interact with. |
+
+## Smoke
+
+Smoke is one **tileable texture** repeated across each room, animated by swapping between its
+frames. No edge tiles are needed: where smoke thins out, only the texture's thickest parts stay
+visible, so the edge of a cloud takes its ragged shape from the texture itself.
+
+**Painting the frames**
+
+- Every frame must **tile seamlessly**: the left edge continues the right edge, and the top
+  continues the bottom. All frames should be the same size and show the same smoke in slightly
+  different shapes, so swapping between them reads as movement (a "boil").
+- Paint the smoke on a **transparent background**, and use opacity to show how thick it is.
+  Thick, opaque areas are the last to disappear when smoke thins. If the frames come
+  white-on-black with no transparency instead, set `alpha_source` to *Luminance* in the smoke
+  settings.
+- Paint it **white/grey** and let `tint` color it, or paint it in color and set `tint` to white.
+
+**Plugging them in:** open `art/art_theme.tres` and put the frames, in order, into
+**Smoke Frames**. Any number of frames works. The two in `art/placeholder/smoke_frame_*.png` are
+placeholders.
+
+**Tuning:** everything else is in **`config/smoke.tres`** (a level can use its own through its
+Level node's **Smoke Config**):
+
+| Setting | Effect |
+|---------|--------|
+| `tint`, `opacity` | Color, and how opaque a completely full room is. |
+| `tile_size` | World size of one texture repeat (a room is about 1000 wide). |
+| `alpha_source` | Read thickness from the frames' transparency or brightness. |
+| `frame_rate` | Frames per second. |
+| `crossfade` | 0 = frames swap instantly (hand-drawn boil), 1 = they blend smoothly. |
+| `drift` | Slow slide of the texture, in world pixels per second. |
+| `edge_breakup`, `edge_softness` | How ragged thin smoke looks (0 = plain fade), and how soft those ragged edges are. |
+| `cell_size`, `spread_speed`, `fill_speed` | How finely and how fast smoke visibly creeps in from doors and sources and gets pulled toward vents. |
+
+These only change how the smoke looks. How much smoke a room holds, and how dangerous it is,
+are set by the smoke sources, vents and doors in the level.
 
 ## Lighting
 

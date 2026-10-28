@@ -32,8 +32,11 @@ facility by opening and closing doors and switching vents. Each room is one pain
 
 - `scripts/core/`: `Palette` and `ArtTheme` (shared sprites; `ArtTheme.active()`).
 - `scripts/level/`: `Level` (finds rooms, doors and objects, links doors, runs the per-room smoke
-  simulation and interactions), `Room` (painting, generated walls with door gaps) and
-  `SmokeOverlay` (drifting puff sprites).
+  simulation and interactions) and `Room` (painting, generated walls with door gaps).
+- `scripts/smoke/`: `SmokeConfig` (look and spread settings, default `config/smoke.tres`, per-level
+  override via `Level.smoke_config`), `SmokeSurface` (one per room: a coarse density grid that
+  spreads smoke from entry points and drives `smoke.gdshader`, which tiles the ArtTheme's
+  `smoke_frames`). Gameplay smoke is still one level per room, and the grid only places it on screen.
 - `scripts/lighting/`: `LightingConfig` (settings, default `config/lighting.tres`, per-level override
   via `Level.lighting`), `PlayerLight` (the player's PointLight2D) and `Lighting` (occluder helpers).
   Walls and closed doors get `LightOccluder2D`s.
@@ -54,4 +57,7 @@ Conventions:
 - Never load a texture (including through `ArtTheme.active()`) for the first time inside
   `_draw()`. It renders as solid white. Resolve textures in `_ready()` or setters and cache
   them, as `Room._resolve_painting()` does.
+- Don't call `load()` in per-frame code unless something else keeps the resource alive. Godot's
+  cache only holds weak references, so an unreferenced resource is reloaded from disk on every
+  call. `ArtTheme.active()` keeps its own reference for this reason.
 - Run `godot --headless --path . res://tests/level_check.tscn` after changing levels or gameplay.
