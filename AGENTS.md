@@ -53,4 +53,7 @@ Conventions:
 - See `scenes/levels/README.md` for building levels and adding object types.
 - Avoid mixing `draw_rect` and `draw_texture_rect` in one `_draw()`. On this setup the textures
   then render as solid squares, so use `Sprite2D` nodes for textured effects.
+- Don't call `load()` in per-frame code unless something else keeps the resource alive. Godot's
+  cache only holds weak references, so an unreferenced resource is reloaded from disk on every
+  call. `ArtTheme.active()` keeps its own reference for this reason.
 - Run `godot --headless --path . res://tests/level_check.tscn` after changing levels or gameplay.
