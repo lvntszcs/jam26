@@ -35,6 +35,8 @@ const ACTIVE_PATH := "res://art/art_theme.tres"
 @export var vent_on: Texture2D
 @export var vent_off: Texture2D
 @export var exit: Texture2D
+## A keycard lying on the floor, waiting to be picked up.
+@export var keycard: Texture2D
 
 @export_group("Effects")
 ## Drawn around the object the player can interact with.

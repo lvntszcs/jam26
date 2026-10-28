@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://art/placeholder/vent_off.png" id="10_voff"]
 [ext_resource type="Texture2D" path="res://art/placeholder/exit.png" id="12_exit"]
 [ext_resource type="Texture2D" path="res://art/placeholder/highlight.png" id="14_highlight"]
+[ext_resource type="Texture2D" path="res://art/placeholder/keycard.png" id="16_keycard"]
 
 [resource]
 script = ExtResource("1_theme")
@@ -19,4 +20,5 @@ door_open = ExtResource("8_dopen")
 vent_on = ExtResource("9_von")
 vent_off = ExtResource("10_voff")
 exit = ExtResource("12_exit")
+keycard = ExtResource("16_keycard")
 highlight = ExtResource("14_highlight")

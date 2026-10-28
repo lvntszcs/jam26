@@ -13,6 +13,7 @@ var _prompt := ""
 
 @onready var title_label: Label = %Title
 @onready var air_bar: ProgressBar = %AirBar
+@onready var keycard_label: Label = %Keycard
 @onready var prompt_label: Label = %Prompt
 @onready var hint_label: Label = %Hint
 @onready var message_panel: PanelContainer = %MessagePanel
@@ -42,6 +43,12 @@ func set_air(air: float, max_air: float) -> void:
 	air_bar.value = air
 	if _fill_style:
 		_fill_style.bg_color = low_air_color if air / max_air < low_air_ratio else _normal_fill_color
+
+
+## Shows the carried keycard's level; hidden while the player has none.
+func set_keycard(keycard_level: int) -> void:
+	keycard_label.visible = keycard_level > 0
+	keycard_label.text = "KEYCARD %d" % keycard_level
 
 
 func set_prompt(text: String) -> void:

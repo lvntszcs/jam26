@@ -82,6 +82,8 @@ func _check_level(scene: PackedScene) -> void:
 		_expect(_reachable(level, level.room_at(level.player.global_position), exits[0].room), name,
 			"exit room reachable with all doors open")
 
+	_check_keycards(level, name)
+
 	# Gas zones sit in a room, the player doesn't start in gas, and gas never spreads.
 	for zone in level.gas_zones:
 		_expect(zone.room != null, name, "%s is inside a room" % zone.name)
@@ -134,6 +136,29 @@ func _check_level(scene: PackedScene) -> void:
 
 	remove_child(level)
 	level.free()
+
+
+## Locked doors stay shut without a good enough keycard, the level's keycards are enough to
+## open every one of them, and they open afterwards. Leaves the player with those keycards.
+func _check_keycards(level: Level, level_name: String) -> void:
+	var player := level.player
+	var locked := level.doors.filter(func(d: Door) -> bool: return d.is_locked() and not d.is_open)
+	for door: Door in locked:
+		door.interact(player)
+		_expect(not door.is_open, level_name, "%s stays shut without a keycard" % door.name)
+	var cards := level.objects.filter(func(o: GameObject) -> bool: return o is Keycard)
+	for card: Keycard in cards:
+		card.interact(player)
+		_expect(not card in level.objects, level_name, "%s is gone once picked up" % card.name)
+	for door: Door in locked:
+		_expect(player.keycard_level >= door.required_keycard, level_name,
+			"a keycard in the level opens %s" % door.name)
+		door.interact(player)
+		_expect(door.is_open and not door.is_locked(), level_name, "%s opens with the keycard" % door.name)
+		door.interact(player)
+	var before := player.keycard_level
+	player.upgrade_keycard()
+	_expect(player.keycard_level == before + 1 or before == 0, level_name, "keycard upgrades one level")
 
 
 func _check_damage_feedback(level: Level, level_name: String) -> void:
