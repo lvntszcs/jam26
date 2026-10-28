@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bv0pobxfsytxv"
-path="res://.godot/imported/computer_room.jpg-7509910c7c77987a9faf688719288f0c.ctex"
+uid="uid://bm1vbwm0a4mua"
+path="res://.godot/imported/computer_room.webp-fa85b10f654121ccbf9f6a908931b451.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/rooms/computer_room.jpg"
-dest_files=["res://.godot/imported/computer_room.jpg-7509910c7c77987a9faf688719288f0c.ctex"]
+source_file="res://art/rooms/computer_room.webp"
+dest_files=["res://.godot/imported/computer_room.webp-fa85b10f654121ccbf9f6a908931b451.ctex"]
 
 [params]
 

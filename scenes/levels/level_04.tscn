@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="5_o3rdr"]
 [ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="9_sibhc"]
 [ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="11_fy4m5"]
-[ext_resource type="Texture2D" path="res://art/rooms/computer_room.jpg" id="14_computerart"]
+[ext_resource type="Texture2D" path="res://art/rooms/computer_room.webp" id="14_computerart"]
 [ext_resource type="Texture2D" path="res://art/rooms/switch_room.webp" id="15_switchart"]
 [ext_resource type="Texture2D" path="res://art/rooms/vent_duct.webp" id="16_ductart"]
 [ext_resource type="Script" uid="uid://d4r8q4so8tex" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
@@ -278,35 +278,35 @@ script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(750, 550)
 
-[node name="ComputerRoomMediumGas" type="Node2D" parent="Gas"]
-position = Vector2(2250, 1150)
-script = ExtResource("gas_zone")
-strength = 1
-size = Vector2(1350, 575)
-
 [node name="ComputerRoomLowGas" type="Node2D" parent="Gas"]
-position = Vector2(3600, 1150)
+position = Vector2(2850, 1150)
 script = ExtResource("gas_zone")
 strength = 0
-size = Vector2(550, 575)
+size = Vector2(850, 650)
+
+[node name="ComputerRoomEastLowGas" type="Node2D" parent="Gas"]
+position = Vector2(3700, 1150)
+script = ExtResource("gas_zone")
+strength = 0
+size = Vector2(450, 575)
+
+[node name="ComputerRoomMediumGas" type="Node2D" parent="Gas"]
+position = Vector2(3700, 1725)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(450, 375)
 
 [node name="ComputerRoomGas" type="Node2D" parent="Gas"]
-position = Vector2(2250, 1725)
+position = Vector2(2250, 1800)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(1425, 725)
+size = Vector2(1450, 650)
 
-[node name="ComputerRoomEdgeMediumGas" type="Node2D" parent="Gas"]
-position = Vector2(3675, 1725)
+[node name="ComputerRoomEastGas" type="Node2D" parent="Gas"]
+position = Vector2(3700, 2100)
 script = ExtResource("gas_zone")
-strength = 1
-size = Vector2(150, 725)
-
-[node name="ComputerRoomEdgeLowGas" type="Node2D" parent="Gas"]
-position = Vector2(3825, 1725)
-script = ExtResource("gas_zone")
-strength = 0
-size = Vector2(325, 725)
+strength = 2
+size = Vector2(450, 350)
 
 [node name="AirlockGas" type="Node2D" parent="Gas"]
 position = Vector2(3050, 2450)
