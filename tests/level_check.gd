@@ -4,95 +4,96 @@ extends Node
 ## Exits with code 0 if all checks pass, 1 otherwise.
 
 const MAIN_SCENE := preload("res://scenes/main.tscn")
-const LEVEL_SCENE := preload("res://scenes/level.tscn")
-const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+const MOVES := ["move_right", "move_left", "move_down", "move_up"]
 
 var _failures := 0
 
 
 func _ready() -> void:
 	var main := MAIN_SCENE.instantiate()
-	var files: PackedStringArray = main.level_files
+	var levels: Array[PackedScene] = main.levels
 	main.free()
-	for path in files:
-		await _check_level(path)
+	for scene in levels:
+		await _check_level(scene)
 	print("level_check: %s" % ("OK" if _failures == 0 else "%d failure(s)" % _failures))
 	get_tree().quit(1 if _failures else 0)
 
 
-func _check_level(path: String) -> void:
-	var data := LevelData.from_file(path)
-	_expect(data != null, path, "file loads")
-	if data == null:
-		return
-	var level: Level = LEVEL_SCENE.instantiate()
+func _check_level(scene: PackedScene) -> void:
+	var level: Level = scene.instantiate()
+	var name := scene.resource_path.get_file()
 	add_child(level)
-	level.build(data)
-	_expect(level.player != null, path, "has a player start")
-	_expect(data.title != "", path, "has a title")
+	_expect(level.player != null, name, "has a PlayerStart")
+	_expect(level.title != "", name, "has a title")
+	_expect(not level.rooms.is_empty(), name, "has rooms")
+	_expect(level.room_at(level.player.global_position) != null, name, "player starts inside a room")
+	for door in level.doors:
+		_expect(door.rooms.size() == 2, name, "%s connects two rooms (got %d)" % [door.name, door.rooms.size()])
+	var exits := level.objects.filter(func(o: GameObject) -> bool: return o is Exit)
+	_expect(not exits.is_empty(), name, "has an exit")
+	for object in level.objects:
+		if not object is Door:
+			_expect(object.room != null, name, "%s is inside a room" % object.name)
+	if not exits.is_empty():
+		_expect(_reachable(level, level.room_at(level.player.global_position), exits[0].room), name,
+			"exit room reachable with all doors open")
 
-	var exits := []
-	for cell: Vector2i in data.cells:
-		if level.entity_at(cell) is Exit:
-			exits.append(cell)
-	_expect(not exits.is_empty(), path, "has an exit")
-	_expect(_exit_reachable(level), path, "exit reachable with all doors open")
+	# Smoke must spread out of the room it starts in.
+	for i in 300:
+		level.step_smoke(0.1)
+	var smoky := level.rooms.filter(func(r: Room) -> bool: return r.smoke > 0.05).size()
+	_expect(smoky > 1, name, "smoke spreads (%d smoky rooms)" % smoky)
 
-	# Let the smoke run for a while: it must spread out of its source.
-	for i in 40:
-		level.smoke._step()
-	var smoky := 0
-	for cell: Vector2i in data.cells:
-		if level.smoke_at(cell) > 0.1:
-			smoky += 1
-	_expect(smoky > 1, path, "smoke spreads (%d smoky cells)" % smoky)
-
-	# Doors toggle and block smoke when closed.
-	for cell: Vector2i in data.cells:
-		var door := level.entity_at(cell) as Door
-		if door:
-			var was_open := door.is_open
+	# Doors toggle and stop smoke flowing when closed.
+	for door in level.doors:
+		var was_open := door.is_open
+		door.interact(level.player)
+		_expect(door.is_open != was_open, name, "%s toggles" % door.name)
+		door.interact(level.player)
+	for door in level.doors:
+		if door.is_open:
 			door.interact(level.player)
-			_expect(door.is_open != was_open, path, "door at %s toggles" % cell)
-			_expect(level.is_smoke_passable(cell) == door.is_open, path, "door at %s smoke blocking" % cell)
-			door.interact(level.player)
+	for room in level.rooms:
+		room.smoke = 0.0
+	level.doors[0].rooms[0].smoke = 1.0
+	var before := level.doors[0].rooms[1].smoke
+	var sources := level.objects.filter(func(o: GameObject) -> bool: return o is SmokeSource and o.room == level.doors[0].rooms[1])
+	if sources.is_empty():
+		level.step_smoke(1.0)
+		_expect(is_equal_approx(level.doors[0].rooms[1].smoke, before), name, "closed door blocks smoke")
 
-	# The player can take a step on its own input.
-	var start := level.player.cell
-	var free_dir := Vector2i.ZERO
-	for dir in DIRECTIONS:
-		if level.is_walkable(start + dir):
-			free_dir = dir
+	# The player walks when movement input is held.
+	for room in level.rooms:
+		room.smoke = 0.0
+	var start := level.player.global_position
+	for action: String in MOVES:
+		Input.action_press(action)
+		await get_tree().create_timer(0.3).timeout
+		Input.action_release(action)
+		if level.player.global_position.distance_to(start) > 20.0:
 			break
-	level.player.facing = free_dir
-	level.player._try_step(free_dir)
-	await get_tree().create_timer(level.player.move_duration + 0.1).timeout
-	_expect(level.player.cell == start + free_dir, path, "player steps")
+	_expect(level.player.global_position.distance_to(start) > 20.0, name, "player moves")
 
 	remove_child(level)
 	level.free()
 
 
-func _exit_reachable(level: Level) -> bool:
-	var open := {level.player.cell: true}
-	var queue := [level.player.cell]
+func _reachable(level: Level, from: Room, to: Room) -> bool:
+	var seen := {from: true}
+	var queue: Array[Room] = [from]
 	while not queue.is_empty():
-		var cell: Vector2i = queue.pop_front()
-		if level.entity_at(cell) is Exit:
+		var room: Room = queue.pop_front()
+		if room == to:
 			return true
-		for dir in DIRECTIONS:
-			var next: Vector2i = cell + dir
-			if open.has(next) or not level.data.is_floor(next):
-				continue
-			var entity := level.entity_at(next)
-			if entity and entity.blocks_movement() and not entity is Door:
-				continue
-			open[next] = true
-			queue.append(next)
+		for door in room.doors:
+			for next in door.rooms:
+				if not seen.has(next):
+					seen[next] = true
+					queue.append(next)
 	return false
 
 
-func _expect(condition: bool, path: String, what: String) -> void:
+func _expect(condition: bool, level_name: String, what: String) -> void:
 	if not condition:
 		_failures += 1
-		push_error("%s: expected %s" % [path, what])
+		push_error("%s: expected %s" % [level_name, what])

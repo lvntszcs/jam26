@@ -1,15 +1,12 @@
+@tool
 class_name ArtTheme
 extends Resource
-## Maps every visual slot in the game to a texture.
-## The active theme is res://art/art_theme.tres - see art/README.md for how to swap art.
-## Textures of any resolution are scaled to fit one tile, so art can be drawn at any size.
+## Maps every shared visual in the game to a texture. Room paintings are not here: each Room
+## node has its own `background`.
+## The active theme is res://art/art_theme.tres. See art/README.md for how to swap art.
+## Textures can be any resolution. Each object fits its art into its own `footprint`.
 
-## Size of one grid cell in world pixels.
-@export var tile_size := 32
-
-@export_group("Tiles")
-@export var floor_tile: Texture2D
-@export var wall_tile: Texture2D
+const ACTIVE_PATH := "res://art/art_theme.tres"
 
 @export_group("Player")
 @export var player_down: Texture2D
@@ -27,10 +24,15 @@ extends Resource
 @export var exit: Texture2D
 
 @export_group("Effects")
-## One smoke puff, drawn per cell. Keep it white/grey and set the color with smoke_tint,
+## One smoke puff. Keep it white/grey and set the color with smoke_tint,
 ## or paint it in color and set smoke_tint to white.
 @export var smoke: Texture2D
 @export var smoke_tint := Palette.VIOLET
-@export_range(0.0, 1.0) var smoke_max_alpha := 0.8
-## Drawn over the cell the player can interact with.
+## Opacity of a single puff in a room full of smoke. Puffs overlap, so keep this low.
+@export_range(0.0, 1.0) var smoke_max_alpha := 0.5
+## Drawn around the object the player can interact with.
 @export var highlight: Texture2D
+
+
+static func active() -> ArtTheme:
+	return load(ACTIVE_PATH)

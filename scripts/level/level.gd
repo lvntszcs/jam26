@@ -1,7 +1,8 @@
 class_name Level
 extends Node2D
-## Builds a playable level from LevelData and answers grid questions for the player,
-## the entities and the smoke ("can I walk here?", "what is in this cell?").
+## A playable level, built in the editor from Room, Door and other GameObject nodes
+## (anywhere under this node) plus a Marker2D named "PlayerStart".
+## At runtime it links doors to rooms, runs the smoke simulation and handles interactions.
 
 signal completed
 signal failed
@@ -9,100 +10,91 @@ signal failed
 signal prompt_changed(text: String)
 
 const PLAYER_SCENE := preload("res://scenes/entities/player.tscn")
-const DOOR_SCENE := preload("res://scenes/entities/door.tscn")
-const VENT_SCENE := preload("res://scenes/entities/vent.tscn")
-const SMOKE_SOURCE_SCENE := preload("res://scenes/entities/smoke_source.tscn")
-const EXIT_SCENE := preload("res://scenes/entities/exit.tscn")
 
-## Level-file character -> the entity scene it spawns and the properties to set on it.
-## Add a new object type by creating its scene and adding a line here.
-const LEGEND := {
-	"D": {"scene": DOOR_SCENE, "props": {"start_open": false}},
-	"d": {"scene": DOOR_SCENE, "props": {"start_open": true}},
-	"V": {"scene": VENT_SCENE, "props": {"start_on": true}},
-	"v": {"scene": VENT_SCENE, "props": {"start_on": false}},
-	"S": {"scene": SMOKE_SOURCE_SCENE, "props": {}},
-	"E": {"scene": EXIT_SCENE, "props": {}},
-}
+@export var title := ""
+@export_multiline var hint := ""
+@export var camera_zoom := 1.0
+## Smoke moved per second through one open door between two rooms, per unit of difference
+## in their smoke levels.
+@export var door_flow := 0.5
 
-var data: LevelData
 var player: Player
+var rooms: Array[Room] = []
+var doors: Array[Door] = []
+var objects: Array[GameObject] = []
 var is_finished := false
-var _entities := {}
 var _prompt := ""
-
-@onready var tiles: TileLayer = $Tiles
-@onready var entities_root: Node2D = $Entities
-@onready var smoke: SmokeField = $Smoke
-@onready var highlight: Sprite2D = $Highlight
+var _focus: GameObject
+var _highlight: Sprite2D
 
 
-func build(level_data: LevelData) -> void:
-	data = level_data
-	tiles.setup(data)
-	for cell: Vector2i in data.cells:
-		var symbol: String = data.cells[cell]
-		if symbol == LevelData.PLAYER_START:
-			_spawn_player(cell)
-		elif LEGEND.has(symbol):
-			_spawn_entity(cell, LEGEND[symbol])
-	if player == null:
-		push_error("Level '%s' has no player start ('%s')." % [data.title, LevelData.PLAYER_START])
-	smoke.setup(self)
-	Art.apply(highlight, Art.theme.highlight)
+func _ready() -> void:
+	_collect(self)
+	for door in doors:
+		_link_door(door)
+	for room in rooms:
+		room.build()
+	for object in objects:
+		object.setup(self, room_at(object.global_position))
+		if object.room == null and not object is Door:
+			push_warning("%s is not inside any room." % object.name)
+	_spawn_player()
+	_highlight = Sprite2D.new()
+	_highlight.texture = ArtTheme.active().highlight
+	_highlight.z_index = 5
+	_highlight.visible = false
+	add_child(_highlight)
+
+
+func _physics_process(delta: float) -> void:
+	if is_finished:
+		return
+	step_smoke(delta)
+	_check_exits()
 
 
 func _process(_delta: float) -> void:
-	_update_interaction_hint()
+	_update_focus()
 
 
-func size_in_pixels() -> Vector2:
-	return Vector2(data.size) * Art.theme.tile_size
+func room_at(point: Vector2) -> Room:
+	for room in rooms:
+		if room.contains(point):
+			return room
+	return null
 
 
-func cell_to_local(cell: Vector2i) -> Vector2:
-	return (Vector2(cell) + Vector2(0.5, 0.5)) * Art.theme.tile_size
+func smoke_at(point: Vector2) -> float:
+	var room := room_at(point)
+	return room.smoke if room else 0.0
 
 
-func entity_at(cell: Vector2i) -> GridEntity:
-	return _entities.get(cell)
+## The union of all rooms, in global coordinates.
+func bounds() -> Rect2:
+	var result := rooms[0].rect()
+	for room in rooms:
+		result = result.merge(room.rect())
+	return result
 
 
-func is_occupied_by_player(cell: Vector2i) -> bool:
-	return player != null and player.cell == cell
+func step_smoke(delta: float) -> void:
+	for door in doors:
+		if door.is_open and door.rooms.size() == 2:
+			var a := door.rooms[0]
+			var b := door.rooms[1]
+			var flow := door_flow * (a.smoke - b.smoke) * delta
+			a.smoke -= flow / a.capacity()
+			b.smoke += flow / b.capacity()
+	for object in objects:
+		if object.room:
+			object.room.smoke = object.affect_smoke(object.room.smoke, delta)
+	for room in rooms:
+		room.smoke = clampf(room.smoke, 0.0, 1.0)
 
 
-func is_walkable(cell: Vector2i) -> bool:
-	if not data.is_floor(cell):
-		return false
-	var entity := entity_at(cell)
-	return entity == null or not entity.blocks_movement()
-
-
-func is_smoke_passable(cell: Vector2i) -> bool:
-	if not data.is_floor(cell):
-		return false
-	var entity := entity_at(cell)
-	return entity == null or not entity.blocks_smoke()
-
-
-func smoke_at(cell: Vector2i) -> float:
-	return smoke.density_at(cell)
-
-
-## Returns true if something in the cell reacted.
-func interact_at(cell: Vector2i, by: Player) -> bool:
-	var entity := entity_at(cell)
-	if entity == null or entity.interaction_prompt() == "":
-		return false
-	entity.interact(by)
-	return true
-
-
-func on_player_entered(cell: Vector2i) -> void:
-	var entity := entity_at(cell)
-	if entity:
-		entity.on_player_entered(player)
+func interact(by: Player) -> void:
+	if _focus:
+		_focus.interact(by)
 
 
 func complete() -> void:
@@ -118,34 +110,78 @@ func fail() -> void:
 func _finish() -> void:
 	is_finished = true
 	player.is_active = false
+	_highlight.visible = false
 
 
-func _spawn_player(cell: Vector2i) -> void:
+func _collect(node: Node) -> void:
+	for child in node.get_children():
+		if child is Room:
+			rooms.append(child)
+		elif child is Door:
+			doors.append(child)
+			objects.append(child)
+		elif child is GameObject:
+			objects.append(child)
+		_collect(child)
+
+
+func _link_door(door: Door) -> void:
+	for room in rooms:
+		if room.rect().grow(door.footprint.y * 0.5).has_point(door.global_position):
+			var hit := room.nearest_edge(door.global_position)
+			door.rooms.append(room)
+			room.doors.append(door)
+			door.vertical = hit.edge == Room.Edge.LEFT or hit.edge == Room.Edge.RIGHT
+	if door.rooms.size() != 2:
+		push_warning("%s touches %d rooms; doors should sit on the wall between two rooms." % [door.name, door.rooms.size()])
+
+
+func _spawn_player() -> void:
+	var start := get_node_or_null("PlayerStart") as Node2D
+	if start == null:
+		push_error("Level '%s' has no Marker2D named PlayerStart." % title)
+		return
 	player = PLAYER_SCENE.instantiate()
-	player.setup(self, cell)
+	player.level = self
+	player.position = start.global_position
 	player.died.connect(fail)
 	add_child(player)
+	var area := bounds()
+	player.camera.zoom = Vector2.ONE * camera_zoom
+	player.camera.limit_left = int(area.position.x)
+	player.camera.limit_top = int(area.position.y)
+	player.camera.limit_right = int(area.end.x)
+	player.camera.limit_bottom = int(area.end.y)
+	player.camera.reset_smoothing()
 
 
-func _spawn_entity(cell: Vector2i, entry: Dictionary) -> void:
-	var entity: GridEntity = entry.scene.instantiate()
-	for property: String in entry.props:
-		entity.set(property, entry.props[property])
-	entity.place(self, cell)
-	entities_root.add_child(entity)
-	_entities[cell] = entity
+func _check_exits() -> void:
+	for object in objects:
+		var exit := object as Exit
+		if exit and player.global_position.distance_to(exit.global_position) <= exit.reach_radius:
+			complete()
+			return
 
 
-func _update_interaction_hint() -> void:
-	var text := ""
-	var target: GridEntity = null
+## Picks the nearest interactable object within the player's reach.
+func _update_focus() -> void:
+	var best: GameObject = null
 	if player and player.is_active:
-		target = entity_at(player.facing_cell())
-		if target:
-			text = target.interaction_prompt()
-	highlight.visible = text != ""
-	if highlight.visible:
-		highlight.position = target.position
+		var best_distance := player.interact_range
+		for object in objects:
+			if object.interaction_prompt() == "":
+				continue
+			var distance := player.global_position.distance_to(object.global_position)
+			if distance < best_distance:
+				best = object
+				best_distance = distance
+	_focus = best
+	_highlight.visible = best != null
+	if best:
+		var target_size := (best as Door).doorway_size() if best is Door else best.footprint
+		_highlight.global_position = best.global_position
+		_highlight.scale = target_size * 1.15 / _highlight.texture.get_size()
+	var text := best.interaction_prompt() if best else ""
 	if text != _prompt:
 		_prompt = text
 		prompt_changed.emit(text)

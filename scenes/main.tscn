@@ -1,14 +1,13 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
-[ext_resource type="PackedScene" path="res://scenes/level.tscn" id="2_level"]
-[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_01.tscn" id="2_level1"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02.tscn" id="3_level2"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_03.tscn" id="4_level3"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hud"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
-level_scene = ExtResource("2_level")
-level_files = PackedStringArray("res://levels/level_01.txt", "res://levels/level_02.txt", "res://levels/level_03.txt")
+levels = Array[PackedScene]([ExtResource("2_level1"), ExtResource("3_level2"), ExtResource("4_level3")])
 
-[node name="Camera" type="Camera2D" parent="."]
-
-[node name="Hud" parent="." instance=ExtResource("3_hud")]
+[node name="Hud" parent="." instance=ExtResource("5_hud")]

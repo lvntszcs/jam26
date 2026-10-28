@@ -26,20 +26,28 @@ In code, use the constants in `scripts/core/palette.gd` (`Palette.TEAL`, `Palett
 
 ## Project structure
 
-Top-down grid puzzle (GDScript, Godot 4.7): escape a smoke-filled island research facility
-by opening and closing doors and switching vents.
+Top-down puzzle (GDScript, Godot 4.7) with free movement: escape a smoke-filled island research
+facility by opening and closing doors and switching vents. Each room is one painted image
+(target style: `art/rooms/lab_reference.webp`).
 
-- `scripts/core/`: `Palette`, `ArtTheme` and the `Art` autoload (the active art theme).
-- `scripts/level/`: `LevelData` (parses `levels/*.txt`), `Level` (grid queries and entity
-  spawning), `SmokeField` (smoke diffusion) and `TileLayer` (floor and wall drawing).
-- `scripts/entities/`: `Player` and the `GridEntity` subclasses (`Door`, `Vent`,
+- `scripts/core/`: `Palette` and `ArtTheme` (shared sprites; `ArtTheme.active()`).
+- `scripts/level/`: `Level` (finds rooms, doors and objects, links doors, runs the per-room smoke
+  simulation and interactions), `Room` (painting, generated walls with door gaps) and
+  `SmokeOverlay` (drifting puff sprites).
+- `scripts/entities/`: `Player` (CharacterBody2D) and the `GameObject` subclasses (`Door`, `Vent`,
   `SmokeSource`, `Exit`).
-- `scripts/main.gd` / `scenes/main.tscn`: game flow and level order. `scripts/ui/hud.gd`: the HUD.
+- `scenes/levels/`: one scene per level, built in the editor. `scenes/main.tscn` sets the level
+  order. `scripts/ui/hud.gd`: the HUD.
 
 Conventions:
 
-- Never reference textures from scenes or scripts directly. Add a slot to `ArtTheme`, fill it
-  in `art/art_theme.tres` and read it through `Art.theme`. This keeps art swappable
-  (see `art/README.md`).
-- Levels are text files. See `levels/README.md` for the format and for adding new object types.
+- Never reference shared textures from scenes or scripts directly. Add a slot to `ArtTheme`,
+  fill it in `art/art_theme.tres` and read it through `ArtTheme.active()`. Room paintings go in
+  the Room's `background`. See `art/README.md`.
+- Size art through `footprint`, never by assuming a texture's resolution.
+- Entity and room scripts are `@tool` so levels preview in the editor. Guard runtime-only code
+  with `Engine.is_editor_hint()`.
+- See `scenes/levels/README.md` for building levels and adding object types.
+- Avoid mixing `draw_rect` and `draw_texture_rect` in one `_draw()`. On this setup the textures
+  then render as solid squares, so use `Sprite2D` nodes for textured effects.
 - Run `godot --headless --path . res://tests/level_check.tscn` after changing levels or gameplay.

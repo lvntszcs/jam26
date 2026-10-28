@@ -1,15 +1,15 @@
+@tool
 class_name Exit
-extends GridEntity
-## The escape hatch. Stepping onto it completes the level.
+extends GameObject
+## The escape hatch. The level is complete when the player reaches its centre.
+
+## How close (in pixels) the player must get to the centre.
+@export var reach_radius := 40.0
 
 
-func blocks_movement() -> bool:
-	return false
+func _init() -> void:
+	solid = false
 
 
-func on_player_entered(_player: Player) -> void:
-	level.complete()
-
-
-func refresh_visual() -> void:
-	Art.apply(sprite, Art.theme.exit)
+func current_texture() -> Texture2D:
+	return ArtTheme.active().exit

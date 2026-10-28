@@ -1,8 +1,6 @@
 [gd_resource type="Resource" script_class="ArtTheme" format=3]
 
 [ext_resource type="Script" path="res://scripts/core/art_theme.gd" id="1_theme"]
-[ext_resource type="Texture2D" path="res://art/placeholder/floor.png" id="2_floor"]
-[ext_resource type="Texture2D" path="res://art/placeholder/wall.png" id="3_wall"]
 [ext_resource type="Texture2D" path="res://art/placeholder/player_down.png" id="4_pdown"]
 [ext_resource type="Texture2D" path="res://art/placeholder/player_up.png" id="5_pup"]
 [ext_resource type="Texture2D" path="res://art/placeholder/player_side.png" id="6_pside"]
@@ -17,9 +15,6 @@
 
 [resource]
 script = ExtResource("1_theme")
-tile_size = 32
-floor_tile = ExtResource("2_floor")
-wall_tile = ExtResource("3_wall")
 player_down = ExtResource("4_pdown")
 player_up = ExtResource("5_pup")
 player_side = ExtResource("6_pside")
@@ -31,5 +26,5 @@ smoke_source = ExtResource("11_source")
 exit = ExtResource("12_exit")
 smoke = ExtResource("13_smoke")
 smoke_tint = Color(0.588235, 0.145098, 0.992157, 1)
-smoke_max_alpha = 0.8
+smoke_max_alpha = 0.5
 highlight = ExtResource("14_highlight")

@@ -1,0 +1,80 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/rooms/room.tscn" id="room"]
+[ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="door"]
+[ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="vent"]
+[ext_resource type="PackedScene" path="res://scenes/entities/smoke_source.tscn" id="source"]
+[ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="exit"]
+[ext_resource type="Script" path="res://scripts/level/level.gd" id="script"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("script")
+title = "02 - Ventilation"
+hint = "Vents pull smoke out of a room. Walk up to one and press E to switch it on, then wait for the air to clear."
+camera_zoom = 0.9
+
+[node name="Rooms" type="Node2D" parent="."]
+
+[node name="Dormitory" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(0, 0)
+room_name = "Dormitory"
+size = Vector2(900, 650)
+
+[node name="Storage" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(0, 650)
+room_name = "Storage"
+size = Vector2(900, 650)
+
+[node name="ChemistryLab" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(900, 0)
+room_name = "Chemistry Lab"
+size = Vector2(900, 1300)
+
+[node name="ServerRoom" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(1800, 0)
+room_name = "Server Room"
+size = Vector2(900, 650)
+
+[node name="Dock" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(1800, 650)
+room_name = "Dock"
+size = Vector2(900, 650)
+
+[node name="Doors" type="Node2D" parent="."]
+
+[node name="Door1" parent="Doors" instance=ExtResource("door")]
+position = Vector2(900, 325)
+
+[node name="Door2" parent="Doors" instance=ExtResource("door")]
+position = Vector2(450, 650)
+start_open = true
+
+[node name="Door3" parent="Doors" instance=ExtResource("door")]
+position = Vector2(900, 975)
+start_open = true
+
+[node name="Door4" parent="Doors" instance=ExtResource("door")]
+position = Vector2(1800, 325)
+start_open = true
+
+[node name="Door5" parent="Doors" instance=ExtResource("door")]
+position = Vector2(2250, 650)
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="SmokeSource1" parent="Objects" instance=ExtResource("source")]
+position = Vector2(1350, 400)
+
+[node name="Vent1" parent="Objects" instance=ExtResource("vent")]
+position = Vector2(250, 1000)
+
+[node name="Vent2" parent="Objects" instance=ExtResource("vent")]
+position = Vector2(2500, 200)
+start_on = false
+
+[node name="Exit1" parent="Objects" instance=ExtResource("exit")]
+position = Vector2(2450, 1050)
+footprint = Vector2(120, 120)
+
+[node name="PlayerStart" type="Marker2D" parent="."]
+position = Vector2(300, 300)

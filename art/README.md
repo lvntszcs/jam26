@@ -1,52 +1,67 @@
 # Art guide
 
-All in-game visuals come from one resource: **`art/art_theme.tres`** (an `ArtTheme`).
-No scene or script points at an image directly, so swapping art never needs code changes.
+The game is drawn from two kinds of art:
 
-## Replacing art
+- **Room paintings**: one image per room, set on each `Room` node.
+- **Shared sprites**: the player, doors, vents, smoke and so on, all listed in **`art/art_theme.tres`**.
 
-Pick whichever is easier:
+No script points at an image directly, so swapping art never needs code changes.
+See `art/rooms/lab_reference.webp` for the target style. It's already used as the Lab in level 1.
 
-1. **Overwrite a placeholder.** Save your image over the file with the same name in
-   `art/placeholder/` (e.g. `door_closed.png`). Godot re-imports it automatically.
-2. **Point the theme at a new file.** Put your image anywhere (e.g. `art/final/door_closed.png`),
-   open `art/art_theme.tres` in the Godot inspector and drag it into the matching slot.
+## Room paintings
 
-Any resolution works. Every texture is scaled so its **width fills one tile** (`tile_size`,
-32 world pixels by default). Square images look best. Taller images (like a character) stay
-centred on their cell and stick out above and below it.
+Each room is a single painting with its walls, floor and decoration painted in.
 
-## Slots
+1. Save the painting in `art/rooms/` (PNG or WebP).
+2. Open the level scene (`scenes/levels/level_NN.tscn`), select the room under `Rooms`, and drag
+   the image into **Background**. The painting is stretched over the room's **Size**, so paint
+   at the same aspect ratio (e.g. 2000x1400 for a 1000x700 room).
+3. Set **Wall Thickness** to roughly match the painted border, in room units
+   (a 50 px border on a 2000 px painting of a 1000-wide room = 25).
 
-| Slot | Placeholder | Notes |
-|------|-------------|-------|
-| `floor_tile` | `floor.png` | Drawn under every non-wall cell, including the cells under doors, vents and the exit. |
-| `wall_tile` | `wall.png` | |
-| `player_down` / `player_up` | `player_down.png` / `player_up.png` | |
-| `player_side` | `player_side.png` | Draw it facing **right**. It's flipped for left. |
-| `door_closed` / `door_open` | `door_*.png` | Draw it for a **horizontal** wall (walls on its left and right). It's rotated 90° in vertical walls. Use transparency so the floor shows through. |
-| `vent_on` / `vent_off` | `vent_*.png` | A running vent spins its sprite. Set `spin_speed = 0` in `scenes/entities/vent.tscn` to stop that. |
-| `smoke_source` | `smoke_source.png` | Pulses. Tune `pulse_amount` in `scenes/entities/smoke_source.tscn`. |
-| `exit` | `exit.png` | The escape hatch. |
-| `smoke` | `smoke.png` | One soft puff, drawn once per cell and slightly larger than it so puffs blend. Keep it **white or grey** and set the color with `smoke_tint`, or paint it in color and set `smoke_tint` to white. `smoke_max_alpha` sets how thick the densest smoke looks. |
-| `highlight` | `highlight.png` | Drawn over the object the player can interact with. |
+Doors cut gaps in the walls automatically. Paint the wall continuous, since the door sprite
+covers the gap. If props are painted into the room (like the lab's broken canister), place the
+matching object on top and tick **Hide Art** so only its gameplay remains. The smoke source
+in level 1 shows how.
 
-## Pixel art vs. smooth art
+Rooms without a background draw a cream placeholder with their name.
 
-The project uses **nearest-neighbour** filtering (crisp pixels). This is set under
-Project Settings → Rendering → Textures → Canvas Textures → Default Texture Filter.
-For painted, high-resolution art, set it to *Linear*. Smoke is always drawn with linear filtering.
+## Shared sprites
+
+Replace one in either of two ways:
+
+1. **Overwrite the placeholder** in `art/placeholder/` with a file of the same name.
+2. **Point the theme at a new file** by opening `art/art_theme.tres` in the inspector and
+   dragging your image into the slot.
+
+Any resolution works. Each object fits its art into its **Footprint** (set per object in the
+level, in world pixels), keeping the aspect ratio. Doors stretch to fill theirs.
+
+| Slot | Notes |
+|------|-------|
+| `player_down` / `player_up` | |
+| `player_side` | Draw facing **right**. It's flipped for left. |
+| `door_closed` / `door_open` | Draw for a **horizontal** wall: width = the opening, height = the wall depth. It's rotated 90° in vertical walls. Use transparency so the room shows through an open door. |
+| `vent_on` / `vent_off` | A running vent spins its sprite. Set `spin_speed = 0` on the vent to stop that. |
+| `smoke_source` | Pulses. Set `pulse_amount = 0` to stop. |
+| `exit` | The escape hatch. |
+| `smoke` | One soft puff. Rooms are covered in drifting puffs whose opacity follows the room's smoke level. Keep it **white or grey** and set the color with `smoke_tint`, or paint it in color and set `smoke_tint` to white. `smoke_max_alpha` sets how thick a full room looks. |
+| `highlight` | Stretched around whatever the player can interact with. |
+
+## Filtering
+
+The project uses smooth (linear) texture filtering, which suits painted art. For pixel art,
+change Project Settings → Rendering → Textures → Canvas Textures → Default Texture Filter.
 
 ## Animation
 
 Each object scene (`scenes/entities/*.tscn`) has a plain `Sprite2D` named `Sprite`. To animate
-one, replace that node with an `AnimatedSprite2D` or add an `AnimationPlayer`, and update the
-`refresh_visual()` function in the matching script under `scripts/entities/`.
+one, add an `AnimationPlayer`, or replace the sprite and update `current_texture()` /
+`refresh_visual()` in the matching script under `scripts/entities/`.
 
 ## UI
 
-HUD colors, fonts and boxes live in `art/ui_theme.tres` (a regular Godot `Theme`). To add a
-custom font, set *Default Font* on that theme.
+HUD colors, fonts and boxes live in `art/ui_theme.tres`, a regular Godot `Theme`.
 
 ## Palette
 

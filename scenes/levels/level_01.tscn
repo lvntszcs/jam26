@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/rooms/room.tscn" id="room"]
+[ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="door"]
+[ext_resource type="PackedScene" path="res://scenes/entities/smoke_source.tscn" id="source"]
+[ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="exit"]
+[ext_resource type="Script" path="res://scripts/level/level.gd" id="script"]
+[ext_resource type="Texture2D" path="res://art/rooms/lab_reference.webp" id="lab_art"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("script")
+title = "01 - Containment Breach"
+hint = "Toxic smoke is leaking from the lab. Walk up to a door and press E to close it, then reach the escape hatch."
+camera_zoom = 1
+
+[node name="Rooms" type="Node2D" parent="."]
+
+[node name="Office" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(0, 0)
+room_name = "Office"
+size = Vector2(1000, 700)
+
+[node name="Lab" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(1000, 0)
+room_name = "Lab"
+size = Vector2(1000, 700)
+background = ExtResource("lab_art")
+
+[node name="Corridor" parent="Rooms" instance=ExtResource("room")]
+position = Vector2(0, 700)
+room_name = "Corridor"
+size = Vector2(2000, 420)
+
+[node name="Doors" type="Node2D" parent="."]
+
+[node name="Door1" parent="Doors" instance=ExtResource("door")]
+position = Vector2(1000, 350)
+start_open = true
+
+[node name="Door2" parent="Doors" instance=ExtResource("door")]
+position = Vector2(500, 700)
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="SmokeSource1" parent="Objects" instance=ExtResource("source")]
+position = Vector2(1470, 340)
+footprint = Vector2(220, 220)
+hide_art = true
+solid_scale = Vector2(0.6, 0.4)
+
+[node name="Exit1" parent="Objects" instance=ExtResource("exit")]
+position = Vector2(1850, 910)
+footprint = Vector2(120, 120)
+
+[node name="PlayerStart" type="Marker2D" parent="."]
+position = Vector2(400, 380)
