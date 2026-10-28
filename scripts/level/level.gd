@@ -1,8 +1,8 @@
 class_name Level
 extends Node2D
-## A playable level, built in the editor from Room, Door and other GameObject nodes
+## A playable level, built in the editor from Room, Door, GasZone and other GameObject nodes
 ## (anywhere under this node) plus a Marker2D named "PlayerStart".
-## At runtime it links doors to rooms, runs the smoke simulation and handles interactions.
+## At runtime it links doors to rooms, lets vents clear gas and handles interactions.
 
 signal completed
 signal failed
@@ -16,23 +16,21 @@ const VOID_MARGIN := 10000.0
 @export var title := ""
 @export_multiline var hint := ""
 @export var camera_zoom := 1.0
-## Smoke moved per second through one open door between two rooms, per unit of difference
-## in their smoke levels.
-@export var door_flow := 0.5
 ## Local illumination for this level. Leave empty to use res://config/lighting.tres.
 @export var lighting: LightingConfig
-## How the smoke looks in this level. Leave empty to use res://config/smoke.tres.
+## How the gas looks, and how strong each GasZone strength is, in this level.
+## Leave empty to use res://config/smoke.tres.
 @export var smoke_config: SmokeConfig
 
 var player: Player
 var rooms: Array[Room] = []
 var doors: Array[Door] = []
 var objects: Array[GameObject] = []
+var gas_zones: Array[GasZone] = []
 var is_finished := false
 var _prompt := ""
 var _focus: GameObject
 var _highlight: Sprite2D
-var _smoke_surfaces := {}
 
 
 func _ready() -> void:
@@ -49,7 +47,10 @@ func _ready() -> void:
 			(object as Vent).toggled.connect(_on_vent_toggled)
 		if object.room == null and not object is Door:
 			push_warning("%s is not inside any room." % object.name)
-	_setup_smoke()
+	for zone in gas_zones:
+		zone.room = room_at(zone.rect().get_center())
+		if zone.room == null:
+			push_warning("%s is not inside any room, so no vent can clear it." % zone.name)
 	_spawn_player()
 	_setup_lighting()
 	_add_void_backdrop()
@@ -63,7 +64,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if is_finished:
 		return
-	step_smoke(delta)
+	step_gas(delta)
 	_check_exits()
 
 
@@ -78,9 +79,13 @@ func room_at(point: Vector2) -> Room:
 	return null
 
 
+## How thick the gas is at a point: the strongest GasZone covering it, 0 if none does.
 func smoke_at(point: Vector2) -> float:
-	var room := room_at(point)
-	return room.smoke if room else 0.0
+	var result := 0.0
+	for zone in gas_zones:
+		if zone.contains(point):
+			result = maxf(result, zone.density())
+	return result
 
 
 ## The union of all rooms, in global coordinates.
@@ -91,36 +96,19 @@ func bounds() -> Rect2:
 	return result
 
 
-## How thick the smoke is in `room` right next to `door`.
-func doorway_smoke(door: Door, room: Room) -> float:
-	var surface: SmokeSurface = _smoke_surfaces.get(room)
-	return surface.density_at(door.global_position) if surface else room.smoke
+## Clears the gas in rooms with a running vent, and lets it return where the vent is off.
+func step_gas(delta: float) -> void:
+	for zone in gas_zones:
+		zone.step(delta, _has_running_vent(zone.room))
 
 
-## 0 to 1: how freely smoke leaves `source` through `door`. Smoke only passes through once the
-## drawn smoke has spread up to the door, and fully once it is as thick there as the room average.
-func _doorway_gate(door: Door, source: Room) -> float:
-	if source.smoke <= 0.0:
-		return 0.0
-	return minf(1.0, doorway_smoke(door, source) / source.smoke)
-
-
-func step_smoke(delta: float) -> void:
-	for door in doors:
-		if door.is_open and door.rooms.size() == 2:
-			var a := door.rooms[0]
-			var b := door.rooms[1]
-			var source := a if a.smoke > b.smoke else b
-			var flow := door_flow * (a.smoke - b.smoke) * delta * _doorway_gate(door, source)
-			a.smoke -= flow / a.capacity()
-			b.smoke += flow / b.capacity()
+func _has_running_vent(room: Room) -> bool:
+	if room == null:
+		return false
 	for object in objects:
-		if object.room:
-			object.room.smoke = object.affect_smoke(object.room.smoke, delta)
-	for room in rooms:
-		room.smoke = clampf(room.smoke, 0.0, 1.0)
-	for surface: SmokeSurface in _smoke_surfaces.values():
-		surface.simulate(delta)
+		if object is Vent and object.room == room and (object as Vent).is_on:
+			return true
+	return false
 
 
 func interact(by: Player) -> void:
@@ -164,6 +152,8 @@ func _collect(node: Node) -> void:
 			objects.append(child)
 		elif child is GameObject:
 			objects.append(child)
+		elif child is GasZone:
+			gas_zones.append(child)
 		_collect(child)
 
 
@@ -196,16 +186,6 @@ func _spawn_player() -> void:
 	player.camera.limit_right = int(area.end.x)
 	player.camera.limit_bottom = int(area.end.y)
 	player.camera.reset_smoothing()
-
-
-## Gives every room a SmokeSurface that draws its smoke.
-func _setup_smoke() -> void:
-	var config := smoke_config if smoke_config else SmokeConfig.load_default()
-	for room in rooms:
-		var surface := SmokeSurface.new()
-		surface.setup(self, room, config)
-		room.add_child(surface)
-		_smoke_surfaces[room] = surface
 
 
 func _on_player_tick_damage(_amount: float) -> void:

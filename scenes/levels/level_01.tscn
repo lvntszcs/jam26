@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://scenes/rooms/room.tscn" id="room"]
 [ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="door"]
-[ext_resource type="PackedScene" path="res://scenes/entities/smoke_source.tscn" id="source"]
+[ext_resource type="Script" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 [ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="exit"]
 [ext_resource type="Script" path="res://scripts/level/level.gd" id="script"]
 [ext_resource type="Texture2D" path="res://art/rooms/lab_reference.webp" id="lab_art"]
@@ -40,13 +40,15 @@ start_open = true
 [node name="Door2" parent="Doors" instance=ExtResource("door")]
 position = Vector2(500, 700)
 
-[node name="Objects" type="Node2D" parent="."]
+[node name="Gas" type="Node2D" parent="."]
 
-[node name="SmokeSource1" parent="Objects" instance=ExtResource("source")]
-position = Vector2(1470, 340)
-footprint = Vector2(220, 220)
-hide_art = true
-solid_scale = Vector2(0.6, 0.4)
+[node name="LabGas" type="Node2D" parent="Gas"]
+position = Vector2(1000, 0)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(1000, 700)
+
+[node name="Objects" type="Node2D" parent="."]
 
 [node name="Exit1" parent="Objects" instance=ExtResource("exit")]
 position = Vector2(1850, 910)

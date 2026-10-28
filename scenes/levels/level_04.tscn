@@ -4,15 +4,16 @@
 [ext_resource type="PackedScene" path="res://scenes/rooms/room.tscn" id="2_tdc43"]
 [ext_resource type="Script" uid="uid://c4nafw0bd4r40" path="res://scripts/level/maze.gd" id="4_d1lip"]
 [ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="5_o3rdr"]
-[ext_resource type="PackedScene" path="res://scenes/entities/smoke_source.tscn" id="7_vmerw"]
 [ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="9_sibhc"]
 [ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="11_fy4m5"]
-[ext_resource type="Texture2D" uid="uid://dii1a5ssd7e4m" path="res://art/rooms/lab_reference.webp" id="13_labart"]
+[ext_resource type="Texture2D" path="res://art/rooms/computer_room.jpg" id="14_computerart"]
+[ext_resource type="Texture2D" path="res://art/rooms/switch_room.webp" id="15_switchart"]
+[ext_resource type="Script" uid="uid://d4r8q4so8tex" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 
 [node name="Level" type="Node2D" unique_id=1452852674]
 script = ExtResource("1_76vq8")
 title = "The Facility"
-hint = "Find your way through the facility to the lift. Close doors to keep the smoke back."
+hint = "Find your way through the facility to the lift. Avoid the gas, or switch on a vent to clear its room."
 camera_zoom = 0.9
 
 [node name="Rooms" type="Node2D" parent="." unique_id=1249259085]
@@ -21,13 +22,11 @@ camera_zoom = 0.9
 position = Vector2(450, 150)
 room_name = "Control Room"
 size = Vector2(1200, 1000)
-start_smoke = 0.7
 
 [node name="NorthMaze" parent="Rooms" unique_id=1456214974 instance=ExtResource("2_tdc43")]
 position = Vector2(150, 1150)
 room_name = "North Maze"
 size = Vector2(2100, 1425)
-start_smoke = 0.3
 
 [node name="Maze" type="Node2D" parent="Rooms/NorthMaze" unique_id=438318916]
 script = ExtResource("4_d1lip")
@@ -55,20 +54,20 @@ layout = PackedStringArray("#######..#######", "#..#...........#", "#..#........
 position = Vector2(900, 2575)
 room_name = "Switch Room"
 size = Vector2(1200, 1125)
+background = ExtResource("15_switchart")
 
-[node name="Lab" parent="Rooms" unique_id=375366068 instance=ExtResource("2_tdc43")]
+[node name="ComputerRoom" parent="Rooms" unique_id=375366068 instance=ExtResource("2_tdc43")]
 position = Vector2(2250, 1150)
 room_name = "Lab"
 size = Vector2(1900, 1300)
-background = ExtResource("13_labart")
+background = ExtResource("14_computerart")
 
 [node name="Airlock" parent="Rooms" unique_id=166131360 instance=ExtResource("2_tdc43")]
 position = Vector2(3050, 2450)
 room_name = "Airlock"
 size = Vector2(400, 300)
-start_smoke = 0.5
 
-[node name="LiftHall" parent="Rooms" unique_id=1936516955 instance=ExtResource("2_tdc43")]
+[node name="LabRoom" parent="Rooms" unique_id=1936516955 instance=ExtResource("2_tdc43")]
 position = Vector2(2100, 2750)
 room_name = "Lift Hall"
 size = Vector2(2050, 1700)
@@ -165,13 +164,32 @@ position = Vector2(5200, 2800)
 stretch_art = true
 solid = false
 
-[node name="Objects" type="Node2D" parent="." unique_id=1160109833]
+[node name="Gas" type="Node2D" parent="." unique_id=1058568288]
 
-[node name="SmokeSource1" parent="Objects" unique_id=2071586820 instance=ExtResource("7_vmerw")]
-position = Vector2(3190, 1520)
-footprint = Vector2(210, 210)
-hide_art = true
-solid_scale = Vector2(0.6, 0.4)
+[node name="ControlRoomGas" type="Node2D" parent="Gas" unique_id=121836963]
+position = Vector2(450, 150)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(1200, 1000)
+
+[node name="NorthMazeGas" type="Node2D" parent="Gas" unique_id=620086847]
+position = Vector2(150, 1150)
+script = ExtResource("gas_zone")
+strength = 0
+size = Vector2(2100, 1425)
+
+[node name="AirlockGas" type="Node2D" parent="Gas" unique_id=171927977]
+position = Vector2(3050, 2450)
+script = ExtResource("gas_zone")
+size = Vector2(400, 300)
+
+[node name="LabGas" type="Node2D" parent="Gas" unique_id=785070240]
+position = Vector2(2250, 1150)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(1900, 1300)
+
+[node name="Objects" type="Node2D" parent="." unique_id=1160109833]
 
 [node name="Vent1" parent="Objects" unique_id=1456957902 instance=ExtResource("9_sibhc")]
 position = Vector2(5200, 2650)
@@ -183,4 +201,4 @@ position = Vector2(3850, 4250)
 solid = false
 
 [node name="PlayerStart" type="Marker2D" parent="." unique_id=469064192]
-position = Vector2(1500, 3140)
+position = Vector2(3121, 3649)

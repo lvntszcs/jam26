@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" path="res://scenes/rooms/room.tscn" id="room"]
 [ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="door"]
 [ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="vent"]
-[ext_resource type="PackedScene" path="res://scenes/entities/smoke_source.tscn" id="source"]
+[ext_resource type="Script" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 [ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="exit"]
 [ext_resource type="Script" path="res://scripts/level/level.gd" id="script"]
 
@@ -91,13 +91,21 @@ start_open = true
 [node name="Door10" parent="Doors" instance=ExtResource("door")]
 position = Vector2(1600, 1500)
 
+[node name="Gas" type="Node2D" parent="."]
+
+[node name="ReactorLabGas" type="Node2D" parent="Gas"]
+position = Vector2(800, 0)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(800, 600)
+
+[node name="GreenhouseGas" type="Node2D" parent="Gas"]
+position = Vector2(1600, 600)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(800, 600)
+
 [node name="Objects" type="Node2D" parent="."]
-
-[node name="SmokeSource1" parent="Objects" instance=ExtResource("source")]
-position = Vector2(1200, 250)
-
-[node name="SmokeSource2" parent="Objects" instance=ExtResource("source")]
-position = Vector2(2000, 900)
 
 [node name="Vent1" parent="Objects" instance=ExtResource("vent")]
 position = Vector2(200, 1000)

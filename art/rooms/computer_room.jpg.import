@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://oedkjeu5imcm"
-path="res://.godot/imported/smoke_source.png-b4a9ce8bde454e948a44a2c6db0cc7a5.ctex"
+uid="uid://bv0pobxfsytxv"
+path="res://.godot/imported/computer_room.jpg-7509910c7c77987a9faf688719288f0c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/placeholder/smoke_source.png"
-dest_files=["res://.godot/imported/smoke_source.png-b4a9ce8bde454e948a44a2c6db0cc7a5.ctex"]
+source_file="res://art/rooms/computer_room.jpg"
+dest_files=["res://.godot/imported/computer_room.jpg-7509910c7c77987a9faf688719288f0c.ctex"]
 
 [params]
 

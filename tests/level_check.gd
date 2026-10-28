@@ -14,6 +14,7 @@ func _ready() -> void:
 	var main := MAIN_SCENE.instantiate()
 	var levels: Array[PackedScene] = main.levels
 	main.free()
+	_expect(not levels.is_empty(), "main.tscn", "lists levels to play")
 	for scene in levels:
 		await _check_level(scene)
 	print("level_check: %s" % ("OK" if _failures == 0 else "%d failure(s)" % _failures))
@@ -81,33 +82,46 @@ func _check_level(scene: PackedScene) -> void:
 		_expect(_reachable(level, level.room_at(level.player.global_position), exits[0].room), name,
 			"exit room reachable with all doors open")
 
-	# Smoke must spread out of the room it starts in.
-	for i in 300:
-		level.step_smoke(0.1)
-	var smoky := level.rooms.filter(func(r: Room) -> bool: return r.smoke > 0.05).size()
-	_expect(smoky > 1, name, "smoke spreads (%d smoky rooms)" % smoky)
+	# Gas zones sit in a room, the player doesn't start in gas, and gas never spreads.
+	for zone in level.gas_zones:
+		_expect(zone.room != null, name, "%s is inside a room" % zone.name)
+	_expect(level.smoke_at(level.player.global_position) == 0.0, name, "player starts out of the gas")
+	var densities := level.gas_zones.map(func(z: GasZone) -> float: return z.density())
+	for door in level.doors:
+		if not door.is_open:
+			door.interact(level.player)
+	level.step_gas(5.0)
+	var vented := level.gas_zones.filter(func(z: GasZone) -> bool: return level._has_running_vent(z.room))
+	for i in level.gas_zones.size():
+		var zone: GasZone = level.gas_zones[i]
+		if not zone in vented:
+			_expect(is_equal_approx(zone.density(), densities[i]), name, "%s stays put with doors open" % zone.name)
 
-	# Doors toggle and stop smoke flowing when closed.
+	# Vents clear the gas in their room, and it returns when they stop.
+	for vent: Vent in level.objects.filter(func(o: GameObject) -> bool: return o is Vent):
+		var zones := level.gas_zones.filter(func(z: GasZone) -> bool: return z.room == vent.room)
+		var was_on := vent.is_on
+		if not was_on:
+			vent.interact(level.player)
+		level.step_gas(10.0)
+		for zone: GasZone in zones:
+			_expect(zone.density() == 0.0, name, "%s clears %s" % [vent.name, zone.name])
+		vent.interact(level.player)
+		level.step_gas(10.0)
+		for zone: GasZone in zones:
+			_expect(zone.density() > 0.0, name, "%s comes back when %s stops" % [zone.name, vent.name])
+		if was_on:
+			vent.interact(level.player)
+		level.step_gas(10.0)
+
+	# Doors toggle.
 	for door in level.doors:
 		var was_open := door.is_open
 		door.interact(level.player)
 		_expect(door.is_open != was_open, name, "%s toggles" % door.name)
 		door.interact(level.player)
-	for door in level.doors:
-		if door.is_open:
-			door.interact(level.player)
-	for room in level.rooms:
-		room.smoke = 0.0
-	level.doors[0].rooms[0].smoke = 1.0
-	var before := level.doors[0].rooms[1].smoke
-	var sources := level.objects.filter(func(o: GameObject) -> bool: return o is SmokeSource and o.room == level.doors[0].rooms[1])
-	if sources.is_empty():
-		level.step_smoke(1.0)
-		_expect(is_equal_approx(level.doors[0].rooms[1].smoke, before), name, "closed door blocks smoke")
 
 	# The player walks when movement input is held.
-	for room in level.rooms:
-		room.smoke = 0.0
 	var start := level.player.global_position
 	for action: String in MOVES:
 		Input.action_press(action)
@@ -126,7 +140,15 @@ func _check_damage_feedback(level: Level, level_name: String) -> void:
 	var player := level.player
 	player.global_position = level.rooms[0].rect().get_center()
 	player.air = player.max_air
-	level.rooms[0].smoke = 1.0
+	# A Strong zone of its own over the player, so other gas doesn't affect the check.
+	var level_zones := level.gas_zones
+	var zone := GasZone.new()
+	zone.strength = GasZone.Strength.STRONG
+	zone.size = level.rooms[0].size
+	zone.position = level.rooms[0].global_position
+	level.add_child(zone)
+	level.gas_zones = [zone]
+	_expect(is_equal_approx(level.smoke_at(player.global_position), 1.0), level_name, "strong gas is full density")
 	var damage: Array[float] = []
 	var events: Array[StringName] = []
 	var record_damage := func(amount: float) -> void: damage.append(amount)
@@ -141,17 +163,18 @@ func _check_damage_feedback(level: Level, level_name: String) -> void:
 	player._breathe(0.1)
 	_expect(damage.size() == 2 and events.size() == 1, level_name,
 		"continuous damage emits damage ticks but throttles haptic events")
-	level.rooms[0].smoke = 0.0
+	zone.cleared = 1.0
 	player._breathe(0.1)
 	_expect(damage.size() == 2 and events.size() == 1, level_name, "recovery emits no damage or haptic event")
 	Haptics._process(Haptics.DAMAGE_INTERVAL)
-	level.rooms[0].smoke = 1.0
+	zone.cleared = 0.0
 	player.air = 1.0
 	player._breathe(0.1)
 	_expect(damage.size() == 3 and is_equal_approx(damage[2], 1.0), level_name,
 		"lethal tick reports remaining air rather than unclamped damage")
 	_expect(events.size() == 2, level_name, "damage haptic resumes after cooldown")
 	_expect(not player.is_active and level.is_finished, level_name, "lethal damage still ends level")
+	level.gas_zones = level_zones
 	player.tick_damage.disconnect(record_damage)
 	Haptics.event_triggered.disconnect(record_event)
 	Haptics.stop()

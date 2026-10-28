@@ -26,24 +26,24 @@ In code, use the constants in `scripts/core/palette.gd` (`Palette.TEAL`, `Palett
 
 ## Project structure
 
-Top-down puzzle (GDScript, Godot 4.7) with free movement: escape a smoke-filled island research
-facility by opening and closing doors and switching vents. Each room is one painted image
+Top-down puzzle (GDScript, Godot 4.7) with free movement: escape a gas-filled island research
+facility by finding a way past fixed gas zones and switching vents. Each room is one painted image
 (target style: `art/rooms/lab_reference.webp`).
 
 - `scripts/core/`: `Palette` and `ArtTheme` (shared sprites; `ArtTheme.active()`).
-- `scripts/level/`: `Level` (finds rooms, doors and objects, links doors, runs the per-room smoke
-  simulation and interactions) and `Room` (painting, generated walls with door gaps).
-- `scripts/smoke/`: `SmokeConfig` (look and spread settings, default `config/smoke.tres`, per-level
-  override via `Level.smoke_config`), `SmokeSurface` (one per room: a coarse density grid that
-  spreads smoke from entry points and drives `smoke.gdshader`, which tiles the ArtTheme's smoke
-  frames, sliced from `smoke_sheet` by `ArtTheme.smoke_animation_frames()`, plus the optional
-  `smoke_edge_mask`). Gameplay smoke is still one level per room, but a door only passes smoke once the grid's smoke
-  has reached it (`Level.doorway_smoke`), and the Level steps the grids in `step_smoke`.
+- `scripts/level/`: `Level` (finds rooms, doors, gas zones and objects, links doors, lets vents
+  clear gas and handles interactions) and `Room` (painting, generated walls with door gaps).
+- `scripts/smoke/`: `GasZone` (a fixed rectangle of Low/Medium/Strong gas, placed in the level
+  or on the Level in `main.tscn`; it never spreads, and a running Vent in its room clears it),
+  `SmokeConfig` (gas strengths, clear speed and look, default `config/smoke.tres`, per-level
+  override via `Level.smoke_config`) and `smoke.gdshader`, which tiles the ArtTheme's smoke
+  frames (sliced from `smoke_sheet` by `ArtTheme.smoke_animation_frames()`) plus the optional
+  `smoke_edge_mask`.
 - `scripts/lighting/`: `LightingConfig` (settings, default `config/lighting.tres`, per-level override
   via `Level.lighting`), `PlayerLight` (the player's PointLight2D) and `Lighting` (occluder helpers).
   Walls and closed doors get `LightOccluder2D`s.
 - `scripts/entities/`: `Player` (CharacterBody2D) and the `GameObject` subclasses (`Door`, `Vent`,
-  `SmokeSource`, `Exit`).
+  `Exit`).
 - `scenes/levels/`: one scene per level, built in the editor. `scenes/main.tscn` sets the level
   order. `scripts/ui/hud.gd`: the HUD.
 

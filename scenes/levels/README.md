@@ -3,25 +3,26 @@
 A level is a Godot scene with the `Level` script on its root. Build it in the editor:
 
 ```
-Level            (level.gd: title, hint, camera zoom, door flow)
+Level            (level.gd: title, hint, camera zoom)
 ├─ Rooms
 │  └─ Office     (instance of scenes/rooms/room.tscn)
 ├─ Doors
 │  └─ Door1      (scenes/entities/door.tscn)
+├─ Gas
+│  └─ LabGas     (GasZone: strength and size)
 ├─ Objects
-│  ├─ SmokeSource1, Vent1, Exit1 ...
+│  ├─ Vent1, Exit1 ...
 └─ PlayerStart   (Marker2D)
 ```
 
-The grouping nodes are only there to keep things tidy. The Level finds rooms, doors and objects
-anywhere beneath it.
+The grouping nodes are only there to keep things tidy. The Level finds rooms, doors, gas zones
+and objects anywhere beneath it.
 
 ## Rooms
 
 - **Position** is the room's top-left corner, and **Size** is its width and height.
 - Put rooms **edge to edge**: the right edge of one is the left edge of the next.
 - Set **Room Name**, a **Background** painting (see `art/README.md`) and **Wall Thickness**.
-- **Start Smoke** (0–1) lets a room begin already polluted.
 
 ## Mazes
 
@@ -41,37 +42,45 @@ anywhere beneath it.
 
 ## Objects
 
-- **Smoke source**: fills its room. Tune `emission_rate`.
-- **Vent**: clears its room while running. Tune `extraction_rate`, and use `start_on` to choose
-  whether it starts running.
+- **Vent**: clears every gas zone in its room while running. Use `start_on` to choose whether it
+  starts running.
 - **Exit**: the level ends when the player reaches it.
 - Every object has **Footprint** (art size), **Solid** (blocks the player) and **Hide Art**.
 
-## How smoke works
+## Gas
 
-Each room has one smoke level from 0 to 1. Every open door moves smoke from the smokier room
-to the cleaner one (`door_flow` on the Level). Sources add smoke and running vents remove it.
-Bigger rooms fill and drain more slowly. Players lose air while their room's smoke is above
-their `safe_smoke` level.
+Gas never moves or spreads. It sits in **gas zones**, each with one of three strengths:
 
-On screen, each room's smoke visibly enters where it comes in (sources, and open doors from
-smokier rooms), spreads across the room, and leaves through vents and doors to cleaner rooms.
-That spreading is visual only: the danger is still the room's single smoke level. To change how
-the smoke looks in one level, assign a copy of `config/smoke.tres` to the Level's
-**Smoke Config**.
+1. Add a **GasZone** node (Add Child Node → GasZone) anywhere under the Level. In `main.tscn`,
+   select the placed **Level** and add it there. That works without opening the level scene,
+   and restarting keeps it.
+2. Its **position** is the top-left corner. Set **Size** and **Strength** (Low, Medium or
+   Strong). In the editor the zone shows the gas itself, with an outline and its strength
+   (lime = Low, rust = Medium, violet = Strong).
+3. Zones may overlap; the strongest one counts.
+
+A running **Vent** clears every zone whose centre is in its room, and the gas comes back when it
+is switched off. Doors only block the way.
+
+How thick and how dangerous each strength is (`low_density`, `medium_density`,
+`strong_density`), and how fast vents clear the gas (`clear_speed`), are in
+`config/smoke.tres`. The player loses `air_loss_per_second` × that density per second while
+it is above their `safe_smoke` level. To change them for one level, assign a copy of
+`config/smoke.tres` to the Level's **Smoke Config**.
 
 ## Adding a level
 
 1. Duplicate an existing level scene in `scenes/levels/`.
 2. Add it to **Levels** on the `Main` node in `scenes/main.tscn`. Levels play in that order.
 3. Run the checks: `godot --headless --path . res://tests/level_check.tscn`. They verify that
-   every door joins two rooms, every object is inside a room, the exit is reachable, the smoke
-   spreads and the player can move.
+   every door joins two rooms, every object and gas zone is inside a room, the exit is
+   reachable, the player starts out of the gas, vents clear their room's gas and the player
+   can move.
 
 ## Adding a new object type
 
 1. Create a script in `scripts/entities/` that extends `GameObject` (start it with `@tool`
-   so it previews in the editor). Override what it needs: `current_texture`, `affect_smoke`,
+   so it previews in the editor). Override what it needs: `current_texture`,
    `interaction_prompt` and `interact`.
 2. Create its scene in `scenes/entities/`: a `Node2D` with that script and a `Sprite2D` child
    named `Sprite`.

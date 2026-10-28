@@ -3,7 +3,7 @@ class_name Room
 extends Node2D
 ## One room of the facility. Its painting is stretched over `size`, with the node's position as
 ## the top-left corner. At runtime, walls are built along the inside of the border, leaving a
-## gap wherever a Door sits on an edge. Rooms that share a door share their smoke.
+## gap wherever a Door sits on an edge.
 
 enum Edge { TOP, BOTTOM, LEFT, RIGHT }
 
@@ -26,10 +26,7 @@ enum Edge { TOP, BOTTOM, LEFT, RIGHT }
 	set(value):
 		wall_thickness = value
 		queue_redraw()
-@export_range(0.0, 1.0) var start_smoke := 0.0
 
-## Current smoke level, 0 (clean) to 1 (unbreathable).
-var smoke := 0.0
 var doors: Array[Door] = []
 ## The texture actually drawn. Resolved outside _draw(): a texture first loaded during
 ## drawing renders as plain white.
@@ -37,7 +34,6 @@ var _painting: Texture2D
 
 
 func _ready() -> void:
-	smoke = start_smoke
 	_resolve_painting()
 
 
@@ -47,11 +43,6 @@ func rect() -> Rect2:
 
 func contains(point: Vector2) -> bool:
 	return rect().has_point(point)
-
-
-## Bigger rooms fill and drain more slowly. A 1000x700 room has capacity 1.
-func capacity() -> float:
-	return maxf(0.1, size.x * size.y / 700000.0)
 
 
 ## The edge nearest to a global point, and the point's distance along that edge.
