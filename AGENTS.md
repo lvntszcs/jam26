@@ -56,8 +56,9 @@ Conventions:
 - Entity and room scripts are `@tool` so levels preview in the editor. Guard runtime-only code
   with `Engine.is_editor_hint()`.
 - See `scenes/levels/README.md` for building levels and adding object types.
-- Avoid mixing `draw_rect` and `draw_texture_rect` in one `_draw()`. On this setup the textures
-  then render as solid squares, so use `Sprite2D` nodes for textured effects.
+- Never load a texture (including through `ArtTheme.active()`) for the first time inside
+  `_draw()`. It renders as solid white. Resolve textures in `_ready()` or setters and cache
+  them, as `Room._resolve_painting()` does.
 - Don't call `load()` in per-frame code unless something else keeps the resource alive. Godot's
   cache only holds weak references, so an unreferenced resource is reloaded from disk on every
   call. `ArtTheme.active()` keeps its own reference for this reason.
