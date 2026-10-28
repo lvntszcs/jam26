@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="11_fy4m5"]
 [ext_resource type="Texture2D" path="res://art/rooms/computer_room.jpg" id="14_computerart"]
 [ext_resource type="Texture2D" path="res://art/rooms/switch_room.webp" id="15_switchart"]
+[ext_resource type="Texture2D" path="res://art/rooms/vent_duct.webp" id="16_ductart"]
 [ext_resource type="Script" uid="uid://d4r8q4so8tex" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 
 [node name="Level" type="Node2D" unique_id=1452852674]
@@ -74,12 +75,15 @@ size = Vector2(2050, 1700)
 
 [node name="EastMaze" parent="Rooms" unique_id=851534767 instance=ExtResource("2_tdc43")]
 position = Vector2(4150, 1150)
-room_name = "East Maze"
+room_name = "Vent Duct"
 size = Vector2(1650, 1650)
+background = ExtResource("16_ductart")
+crawl_space = true
 
 [node name="Maze" type="Node2D" parent="Rooms/EastMaze" unique_id=60393283]
 script = ExtResource("4_d1lip")
-layout = PackedStringArray("######################", "#.....#..............#", "#.....#..............#", "####..#..####..#..#..#", "#..#..#.....#.....#..#", "#..#..#.....#.....#..#", "#..#..##########..#..#", "#..#..............#..#", "#..#..............#..#", "...#..#..#######..#..#", ".........#........#..#", "#........#........#..#", "#..#######..#..####..#", "#...........#........#", "#...........#........#", "#..#..####..##########", "#.....#.....#.....#..#", "#.....#.....#.....#..#", "#..####..#..#..#..#..#", "#........#.....#.....#", "#........#.....#.....#", "#############..#######")
+cell_size = 25.0
+from_painting = true
 
 [node name="Passage" parent="Rooms" unique_id=365335876 instance=ExtResource("2_tdc43")]
 position = Vector2(4150, 3200)
@@ -143,7 +147,7 @@ stretch_art = true
 solid = false
 
 [node name="Door10" parent="Doors" unique_id=1163121140 instance=ExtResource("5_o3rdr")]
-position = Vector2(4150, 1900)
+position = Vector2(4150, 1830)
 stretch_art = true
 solid = false
 
@@ -160,7 +164,7 @@ stretch_art = true
 solid = false
 
 [node name="Door13" parent="Doors" unique_id=407397220 instance=ExtResource("5_o3rdr")]
-position = Vector2(5200, 2800)
+position = Vector2(5305, 2800)
 stretch_art = true
 solid = false
 
@@ -319,7 +323,7 @@ size = Vector2(375, 150)
 [node name="Objects" type="Node2D" parent="." unique_id=1160109833]
 
 [node name="Vent1" parent="Objects" unique_id=1456957902 instance=ExtResource("9_sibhc")]
-position = Vector2(5200, 2650)
+position = Vector2(5305, 2650)
 start_on = false
 solid = false
 

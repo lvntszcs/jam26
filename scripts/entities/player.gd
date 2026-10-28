@@ -36,6 +36,8 @@ var is_active := true
 var _walk_time := 0.0
 var _step_distance := 0.0
 var _footstep_index := 0
+## True while in a crawl space (see Room.crawl_space), where the crawl sheet is shown.
+var _crawling := false
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var camera: Camera2D = $Camera
@@ -132,28 +134,42 @@ func _breathe(delta: float) -> void:
 
 
 func _setup_sprite() -> void:
+	_use_sheet(false)
+	sprite.rotation = facing.angle() - deg_to_rad(ArtTheme.active().player_art_angle)
+
+
+## Shows the walking or the crawling spritesheet, fitted into the footprint.
+func _use_sheet(crawling: bool) -> void:
 	var art := ArtTheme.active()
-	sprite.texture = art.player_sheet
-	sprite.hframes = art.player_sheet_columns
-	sprite.vframes = art.player_sheet_rows
-	sprite.frame = art.player_idle_frame
-	if art.player_sheet:
-		var frame_size := art.player_sheet.get_size() / Vector2(art.player_sheet_columns, art.player_sheet_rows)
-		var fit := footprint / frame_size
+	_crawling = crawling
+	var sheet := art.player_crawl_sheet if crawling else art.player_sheet
+	var grid := Vector2i(art.player_crawl_columns, art.player_crawl_rows) if crawling 		else Vector2i(art.player_sheet_columns, art.player_sheet_rows)
+	sprite.texture = sheet
+	sprite.hframes = grid.x
+	sprite.vframes = grid.y
+	sprite.frame = art.player_crawl_idle_frame if crawling else art.player_idle_frame
+	if sheet:
+		var fit := footprint / (sheet.get_size() / Vector2(grid))
 		sprite.scale = Vector2.ONE * minf(fit.x, fit.y)
-	sprite.rotation = facing.angle() - deg_to_rad(art.player_art_angle)
 
 
-## Turns the sprite toward the walking direction and steps through the walk cycle at a rate
-## that follows the current speed, so the feet don't slide.
+## Turns the sprite toward the walking direction and steps through the walk (or, in a crawl
+## space, the crawl) cycle at a rate that follows the current speed, so the feet don't slide.
 func _animate(delta: float) -> void:
 	var art := ArtTheme.active()
+	var room := level.room_at(global_position)
+	var crawling := room != null and room.crawl_space and art.player_crawl_sheet != null
+	if crawling != _crawling:
+		_use_sheet(crawling)
+	var frames := art.player_crawl_frames if crawling else art.player_walk_frames
+	var idle_frame := art.player_crawl_idle_frame if crawling else art.player_idle_frame
+	var fps := art.player_crawl_fps if crawling else art.player_walk_fps
 	var target := facing.angle() - deg_to_rad(art.player_art_angle)
 	sprite.rotation = lerp_angle(sprite.rotation, target, minf(1.0, turn_speed * delta))
 	var pace := velocity.length() / speed
-	if pace < 0.1 or art.player_walk_frames.is_empty():
+	if pace < 0.1 or frames.is_empty():
 		_walk_time = 0.0
-		sprite.frame = art.player_idle_frame
+		sprite.frame = idle_frame
 		return
-	_walk_time += delta * art.player_walk_fps * pace
-	sprite.frame = art.player_walk_frames[int(_walk_time) % art.player_walk_frames.size()]
+	_walk_time += delta * fps * pace
+	sprite.frame = frames[int(_walk_time) % frames.size()]

@@ -27,6 +27,16 @@ const ACTIVE_PATH := "res://art/art_theme.tres"
 @export var player_walk_fps := 8.0
 ## Which way the character faces in the art, in degrees: -90 = up, 0 = right, 90 = down.
 @export var player_art_angle := -90.0
+## The player crawling, used in crawl spaces (Rooms with `crawl_space`), like vent ducts. Same
+## layout rules as `player_sheet`; the art faces `player_art_angle` too.
+@export var player_crawl_sheet: Texture2D
+@export var player_crawl_columns := 2
+@export var player_crawl_rows := 2
+## Frame shown while lying still in a crawl space.
+@export var player_crawl_idle_frame := 0
+@export var player_crawl_frames := PackedInt32Array([0, 1, 2, 1])
+## Crawl-cycle frames per second at full speed.
+@export var player_crawl_fps := 5.0
 
 @export_group("Objects")
 ## Drawn for a door in a horizontal wall; rotated 90 degrees for vertical walls.

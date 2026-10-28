@@ -21,6 +21,8 @@ enum Edge { TOP, BOTTOM, LEFT, RIGHT }
 	set(value):
 		background = value
 		_resolve_painting()
+## A crawl space, like a vent duct: the player crawls here instead of walking.
+@export var crawl_space := false
 ## Thickness of the painted border that counts as wall.
 @export var wall_thickness := 28.0:
 	set(value):

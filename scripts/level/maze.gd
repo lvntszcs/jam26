@@ -4,6 +4,8 @@ extends Node2D
 ## Interior walls of a room, laid out as text: one string per row, "#" is a wall cell and
 ## anything else is floor. Add it as a child of a Room at position (0, 0) so the grid starts at
 ## the room's top-left corner. Keep corridors at least two cells wide so the player fits.
+## With `from_painting`, the walls come from the Room's painting instead (for rooms like a vent
+## duct, where the painting already shows the walls).
 
 @export var cell_size := 75.0:
 	set(value):
@@ -13,10 +15,18 @@ extends Node2D
 	set(value):
 		layout = value
 		queue_redraw()
+## Build the walls from the parent Room's painting instead of `layout`: every cell whose centre
+## is transparent in the painting is a wall. The painting shows the walls, so none are drawn.
+@export var from_painting := false:
+	set(value):
+		from_painting = value
+		queue_redraw()
 
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
+		if from_painting:
+			layout = _layout_from_painting()
 		_build()
 
 
@@ -69,7 +79,31 @@ func _build() -> void:
 		add_child(occluder)
 
 
+## One row per cell of the parent Room: "#" where the painting is transparent, "." elsewhere.
+func _layout_from_painting() -> PackedStringArray:
+	var rows := PackedStringArray()
+	var room := get_parent() as Room
+	if room == null or room.background == null:
+		push_warning("%s: from_painting needs a parent Room with a background." % name)
+		return rows
+	var image := room.background.get_image()
+	if image.is_compressed():
+		image.decompress()
+	var cells := Vector2i((room.size / cell_size).ceil())
+	var texel := Vector2(image.get_size()) / room.size
+	for y in cells.y:
+		var row := ""
+		for x in cells.x:
+			var point := ((Vector2(x, y) + Vector2(0.5, 0.5)) * cell_size * texel).floor()
+			point = point.clamp(Vector2.ZERO, Vector2(image.get_size() - Vector2i.ONE))
+			row += "." if image.get_pixelv(Vector2i(point)).a > 0.5 else "#"
+		rows.append(row)
+	return rows
+
+
 func _draw() -> void:
+	if from_painting:
+		return
 	for rect in wall_rects():
 		draw_rect(rect, Palette.TEAL)
 		draw_rect(rect, Palette.MAROON, false, 3.0)
