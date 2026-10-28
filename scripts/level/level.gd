@@ -17,6 +17,8 @@ const PLAYER_SCENE := preload("res://scenes/entities/player.tscn")
 ## Smoke moved per second through one open door between two rooms, per unit of difference
 ## in their smoke levels.
 @export var door_flow := 0.5
+## Local illumination for this level. Leave empty to use res://config/lighting.tres.
+@export var lighting: LightingConfig
 
 var player: Player
 var rooms: Array[Room] = []
@@ -39,6 +41,7 @@ func _ready() -> void:
 		if object.room == null and not object is Door:
 			push_warning("%s is not inside any room." % object.name)
 	_spawn_player()
+	_setup_lighting()
 	_highlight = Sprite2D.new()
 	_highlight.texture = ArtTheme.active().highlight
 	_highlight.z_index = 5
@@ -153,6 +156,18 @@ func _spawn_player() -> void:
 	player.camera.limit_right = int(area.end.x)
 	player.camera.limit_bottom = int(area.end.y)
 	player.camera.reset_smoothing()
+
+
+## Darkens the world with a CanvasModulate and gives the player's light its settings.
+## The HUD sits on its own CanvasLayer, so it stays unaffected.
+func _setup_lighting() -> void:
+	var config := lighting if lighting else LightingConfig.load_default()
+	if player:
+		player.light.apply(config)
+	if config.enabled:
+		var dark := CanvasModulate.new()
+		dark.color = config.darkness
+		add_child(dark)
 
 
 func _check_exits() -> void:

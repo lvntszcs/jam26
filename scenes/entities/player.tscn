@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/lighting/player_light.gd" id="2_light"]
 
 [sub_resource type="CircleShape2D" id="body"]
 radius = 30.0
@@ -14,6 +15,9 @@ script = ExtResource("1_script")
 
 [node name="Collision" type="CollisionShape2D" parent="."]
 shape = SubResource("body")
+
+[node name="Light" type="PointLight2D" parent="."]
+script = ExtResource("2_light")
 
 [node name="Camera" type="Camera2D" parent="."]
 position_smoothing_enabled = true

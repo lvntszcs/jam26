@@ -34,6 +34,9 @@ facility by opening and closing doors and switching vents. Each room is one pain
 - `scripts/level/`: `Level` (finds rooms, doors and objects, links doors, runs the per-room smoke
   simulation and interactions), `Room` (painting, generated walls with door gaps) and
   `SmokeOverlay` (drifting puff sprites).
+- `scripts/lighting/`: `LightingConfig` (settings, default `config/lighting.tres`, per-level override
+  via `Level.lighting`), `PlayerLight` (the player's PointLight2D) and `Lighting` (occluder helpers).
+  Walls and closed doors get `LightOccluder2D`s.
 - `scripts/entities/`: `Player` (CharacterBody2D) and the `GameObject` subclasses (`Door`, `Vent`,
   `SmokeSource`, `Exit`).
 - `scenes/levels/`: one scene per level, built in the editor. `scenes/main.tscn` sets the level

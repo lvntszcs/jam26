@@ -21,6 +21,7 @@ signal toggled(is_open: bool)
 var is_open := false
 var rooms: Array[Room] = []
 var _blocker_shape: CollisionShape2D
+var _occluder: LightOccluder2D
 
 
 func _init() -> void:
@@ -50,6 +51,7 @@ func interact(by: Player) -> void:
 		return
 	is_open = not is_open
 	_blocker_shape.set_deferred("disabled", is_open)
+	_occluder.visible = not is_open
 	refresh_visual()
 	toggled.emit(is_open)
 
@@ -65,6 +67,7 @@ func refresh_visual() -> void:
 		sprite.rotation = PI / 2.0 if vertical else 0.0
 	if _blocker_shape:
 		_blocker_shape.rotation = sprite.rotation
+		_occluder.rotation = sprite.rotation
 
 
 func _add_blocker() -> void:
@@ -77,6 +80,12 @@ func _add_blocker() -> void:
 	_blocker_shape.disabled = is_open
 	body.add_child(_blocker_shape)
 	add_child(body)
+	# A closed door blocks light like the wall around it.
+	_occluder = LightOccluder2D.new()
+	_occluder.occluder = Lighting.rect_occluder(Rect2(-footprint * 0.5, footprint))
+	_occluder.rotation = sprite.rotation
+	_occluder.visible = not is_open
+	add_child(_occluder)
 
 
 func _overlaps(by: Player) -> bool:
