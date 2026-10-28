@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04.tscn" id="2_facility"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hud"]
 [ext_resource type="AudioStream" uid="uid://bwclnb3buwtpf" path="res://audio/ambience/flickering_lights.mp3" id="6_ambience"]
+[ext_resource type="AudioStream" uid="uid://dbcmhl2txjsth" path="res://audio/ambience/music_loop.wav" id="7_music"]
 
 [node name="Main" type="Node" unique_id=844661874]
 script = ExtResource("1_main")
@@ -18,3 +19,8 @@ stream = ExtResource("6_ambience")
 volume_db = 15.044
 autoplay = true
 bus = &"Ambience"
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_music")
+autoplay = true
+bus = &"Music"
