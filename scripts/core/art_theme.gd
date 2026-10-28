@@ -43,5 +43,12 @@ const ACTIVE_PATH := "res://art/art_theme.tres"
 @export var highlight: Texture2D
 
 
+## Holds the active theme. Godot's resource cache only keeps weak references, so without this
+## every active() call would reload the theme and all its textures from disk.
+static var _active: ArtTheme
+
+
 static func active() -> ArtTheme:
-	return load(ACTIVE_PATH)
+	if _active == null:
+		_active = load(ACTIVE_PATH)
+	return _active
