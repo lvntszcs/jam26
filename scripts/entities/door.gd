@@ -7,6 +7,11 @@ extends GameObject
 
 signal toggled(is_open: bool)
 
+## Canvas layer for door sprites: above the world, below the HUD.
+const DOOR_LAYER := 1
+## How fast a door's shading follows the light reaching it.
+const DIM_SPEED := 8.0
+
 @export var start_open := false:
 	set(value):
 		start_open = value
@@ -21,6 +26,7 @@ signal toggled(is_open: bool)
 var is_open := false
 var rooms: Array[Room] = []
 var _blocker_shape: CollisionShape2D
+var _blocker_body: StaticBody2D
 var _occluder: LightOccluder2D
 
 
@@ -35,6 +41,7 @@ func _ready() -> void:
 	super()
 	if not Engine.is_editor_hint():
 		_add_blocker()
+		_lift_out_of_darkness()
 
 
 func current_texture() -> Texture2D:
@@ -72,6 +79,7 @@ func refresh_visual() -> void:
 
 func _add_blocker() -> void:
 	var body := StaticBody2D.new()
+	_blocker_body = body
 	_blocker_shape = CollisionShape2D.new()
 	var box := RectangleShape2D.new()
 	box.size = footprint
@@ -86,6 +94,32 @@ func _add_blocker() -> void:
 	_occluder.rotation = sprite.rotation
 	_occluder.visible = not is_open
 	add_child(_occluder)
+
+
+func _process(delta: float) -> void:
+	if Engine.is_editor_hint() or level == null or level.player == null:
+		return
+	var light := level.player.light
+	var target := Color.WHITE
+	if light.config and light.config.enabled:
+		var brightness := light.brightness_at(global_position, [_blocker_body.get_rid()])
+		target = light.config.darkness + light.config.color * brightness
+		target.a = 1.0
+	# Ease toward the new brightness so doors don't pop when line of sight changes.
+	sprite.modulate = sprite.modulate.lerp(target, minf(1.0, DIM_SPEED * delta))
+
+
+## The sprite moves to its own canvas layer that follows the camera, out of reach of its own
+## light occluder (which would keep it black). _process() then shades it by hand from the
+## player's light, so it fades in and out with the light around it.
+func _lift_out_of_darkness() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = DOOR_LAYER
+	layer.follow_viewport_enabled = true
+	add_child(layer)
+	sprite.reparent(layer, false)
+	sprite.position = global_position
+	sprite.modulate = Color.BLACK
 
 
 func _overlaps(by: Player) -> bool:

@@ -6,12 +6,12 @@
 script = ExtResource("1_config")
 enabled = true
 darkness = Color(0.06, 0, 0.025, 1)
-radius = 300.0
-softness = 0.55
+radius = 380.0
+softness = 0.8
 color = Color(0.945098, 0.992157, 0.85098, 1)
 energy = 0.85
 flicker_amount = 0.06
 flicker_speed = 7.0
 shadows = true
 shadow_color = Color(0, 0, 0, 1)
-shadow_smooth = 4.0
+shadow_smooth = 8.0

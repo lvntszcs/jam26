@@ -23,6 +23,15 @@ anywhere beneath it.
 - Set **Room Name**, a **Background** painting (see `art/README.md`) and **Wall Thickness**.
 - **Start Smoke** (0–1) lets a room begin already polluted.
 
+## Mazes
+
+- For interior walls, add a node with the `Maze` script (`scripts/level/maze.gd`) as a child of a
+  room at position (0, 0).
+- **Layout** is one text line per row: `#` is a wall cell, `.` is floor. **Cell Size** (75) is
+  the size of one character in world pixels.
+- Keep corridors at least two cells wide, and open the cells in front of each door.
+- `level_04.tscn` has four mazes to copy from.
+
 ## Doors
 
 - Place a door's centre **on the shared edge** between two rooms. It links itself to both

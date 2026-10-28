@@ -24,6 +24,11 @@ signal died
 ## Smoke below this level is safe to breathe.
 @export_range(0.0, 1.0) var safe_smoke := 0.2
 
+## Debug god mode (G): no air is lost. Static so it survives level restarts.
+static var invincible := false
+## Debug noclip (N): walk through walls and closed doors.
+static var noclip := false
+
 var level: Level
 var facing := Vector2.DOWN
 var air := 0.0
@@ -40,6 +45,7 @@ var _step_distance := 0.0
 func _ready() -> void:
 	air = max_air
 	_setup_sprite()
+	_refresh_cheat_tint()
 	air_changed.emit(air, max_air)
 
 
@@ -54,7 +60,10 @@ func _physics_process(delta: float) -> void:
 		velocity = velocity.move_toward(input * speed, acceleration * delta)
 		facing = input
 	var previous_position := global_position
-	move_and_slide()
+	if noclip:
+		global_position += velocity * delta
+	else:
+		move_and_slide()
 	_movement_feedback(global_position.distance_to(previous_position))
 	_animate(delta)
 	_breathe(delta)
@@ -64,6 +73,26 @@ func _unhandled_input(event: InputEvent) -> void:
 	if is_active and event.is_action_pressed("interact"):
 		level.interact(self)
 		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("god_mode"):
+		invincible = not invincible
+		_refresh_cheat_tint()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("noclip"):
+		noclip = not noclip
+		_refresh_cheat_tint()
+		get_viewport().set_input_as_handled()
+
+
+## Lime tint = god mode, violet = noclip, a blend of both when both are on.
+func _refresh_cheat_tint() -> void:
+	if invincible and noclip:
+		sprite.modulate = Palette.LIME.lerp(Palette.VIOLET, 0.5)
+	elif invincible:
+		sprite.modulate = Palette.LIME
+	elif noclip:
+		sprite.modulate = Palette.VIOLET
+	else:
+		sprite.modulate = Color.WHITE
 
 
 func _movement_feedback(distance: float) -> void:
@@ -80,7 +109,9 @@ func _movement_feedback(distance: float) -> void:
 func _breathe(delta: float) -> void:
 	var smoke := level.smoke_at(global_position)
 	var previous := air
-	if smoke > safe_smoke:
+	if invincible:
+		air = max_air
+	elif smoke > safe_smoke:
 		air -= air_loss_per_second * smoke * delta
 	else:
 		air += air_recovery_per_second * delta

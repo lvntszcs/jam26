@@ -27,6 +27,14 @@ const DEFAULT_PATH := "res://config/lighting.tres"
 ## Flicker speed in wobbles per second.
 @export var flicker_speed := 7.0
 
+@export_group("Blackout")
+## The light goes out now and then, at a random time between these two (seconds).
+## Set the duration to 0 to turn blackouts off.
+@export var blackout_interval_min := 10.0
+@export var blackout_interval_max := 20.0
+## How long the light stays out, in seconds.
+@export var blackout_duration := 0.5
+
 @export_group("Shadows")
 ## Walls and closed doors block the light, so other rooms stay dark.
 @export var shadows := true

@@ -10,6 +10,8 @@ signal failed
 signal prompt_changed(text: String)
 
 const PLAYER_SCENE := preload("res://scenes/entities/player.tscn")
+## How far past the map's edge the black backdrop reaches (covers any zoomed-out view).
+const VOID_MARGIN := 10000.0
 
 @export var title := ""
 @export_multiline var hint := ""
@@ -50,6 +52,7 @@ func _ready() -> void:
 	_setup_smoke()
 	_spawn_player()
 	_setup_lighting()
+	_add_void_backdrop()
 	_highlight = Sprite2D.new()
 	_highlight.texture = ArtTheme.active().highlight
 	_highlight.z_index = 5
@@ -219,6 +222,22 @@ func _setup_lighting() -> void:
 		var dark := CanvasModulate.new()
 		dark.color = config.darkness
 		add_child(dark)
+
+
+## Everything outside the rooms (gaps between them and the area past the map's edge) is
+## plain black instead of the window's clear color.
+func _add_void_backdrop() -> void:
+	var void_rect := bounds().grow(VOID_MARGIN)
+	var backdrop := Polygon2D.new()
+	backdrop.polygon = PackedVector2Array([
+		void_rect.position,
+		Vector2(void_rect.end.x, void_rect.position.y),
+		void_rect.end,
+		Vector2(void_rect.position.x, void_rect.end.y),
+	])
+	backdrop.color = Color.BLACK
+	backdrop.z_index = RenderingServer.CANVAS_ITEM_Z_MIN
+	add_child(backdrop)
 
 
 func _check_exits() -> void:
