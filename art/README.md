@@ -118,6 +118,7 @@ in the inspector:
 | `softness` | 0 = hard edge, 1 = fades out from the centre. |
 | `color` / `energy` | Light color and brightness. Raising `energy` above 1 washes out the art. |
 | `flicker_amount` / `flicker_speed` | Torch-like wobble. Set the amount to 0 for a steady light. |
+| `blackout_interval_min` / `_max`, `blackout_duration` | The light goes out for `blackout_duration` seconds at a random time between the two intervals. Set the duration to 0 to turn this off. |
 | `shadows`, `shadow_color`, `shadow_smooth` | Walls and closed doors block the light, so you can't see into other rooms. |
 
 To give one level different lighting (e.g. a darker final level), duplicate the file and assign

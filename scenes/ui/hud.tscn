@@ -4,6 +4,7 @@
 [ext_resource type="Theme" path="res://art/ui_theme.tres" id="2_theme"]
 
 [node name="Hud" type="CanvasLayer"]
+layer = 10
 script = ExtResource("1_hud")
 
 [node name="Root" type="Control" parent="."]

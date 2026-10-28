@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://yhsy768dsah0"]
+
+[ext_resource type="Script" uid="uid://cwmtlxw2xph7h" path="res://scripts/level/level.gd" id="1_76vq8"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/room.tscn" id="2_tdc43"]
+[ext_resource type="Script" uid="uid://c4nafw0bd4r40" path="res://scripts/level/maze.gd" id="4_d1lip"]
+[ext_resource type="PackedScene" path="res://scenes/entities/door.tscn" id="5_o3rdr"]
+[ext_resource type="PackedScene" path="res://scenes/entities/smoke_source.tscn" id="7_vmerw"]
+[ext_resource type="PackedScene" path="res://scenes/entities/vent.tscn" id="9_sibhc"]
+[ext_resource type="PackedScene" path="res://scenes/entities/exit.tscn" id="11_fy4m5"]
+[ext_resource type="Texture2D" uid="uid://dii1a5ssd7e4m" path="res://art/rooms/lab_reference.webp" id="13_labart"]
+
+[node name="Level" type="Node2D" unique_id=1452852674]
+script = ExtResource("1_76vq8")
+title = "The Facility"
+hint = "Find your way through the facility to the lift. Close doors to keep the smoke back."
+camera_zoom = 0.9
+
+[node name="Rooms" type="Node2D" parent="." unique_id=1249259085]
+
+[node name="ControlRoom" parent="Rooms" unique_id=112103507 instance=ExtResource("2_tdc43")]
+position = Vector2(450, 150)
+room_name = "Control Room"
+size = Vector2(1200, 1000)
+start_smoke = 0.7
+
+[node name="NorthMaze" parent="Rooms" unique_id=1456214974 instance=ExtResource("2_tdc43")]
+position = Vector2(150, 1150)
+room_name = "North Maze"
+size = Vector2(2100, 1425)
+start_smoke = 0.3
+
+[node name="Maze" type="Node2D" parent="Rooms/NorthMaze" unique_id=438318916]
+script = ExtResource("4_d1lip")
+layout = PackedStringArray("#############..#############", "#..#.......................#", "#..#.......................#", "#..####..################..#", "#.....#.....#...........#..#", "#.....#.....#...........#..#", "####..#..#..#######..####..#", "#..#..#...........#........#", "#..#..#...........#........#", "#..#..#..####..#..#..#######", "#..#..#..#.....#..#........#", "#..#..#..#.....#..#........#", "#..#..####..#..#..#######..#", "#..#...........#.....#..#...", "#..#...........#.....#..#...", "#..##########..####..#..#..#", "#....................#.....#", "#....................#.....#", "####..##########..##########")
+
+[node name="WestMaze" parent="Rooms" unique_id=1679385078 instance=ExtResource("2_tdc43")]
+position = Vector2(150, 2575)
+room_name = "West Maze"
+size = Vector2(750, 2100)
+
+[node name="Maze" type="Node2D" parent="Rooms/WestMaze" unique_id=2019537700]
+script = ExtResource("4_d1lip")
+layout = PackedStringArray("####..####", "#........#", "#........#", "#######..#", "#.....#..#", "#.....#..#", "#..#..#..#", "#..#..#..#", "#..#..#..#", "#..####..#", "#..#.....#", "#..#.....#", "#..#..####", "#..#.....#", "#..#.....#", "#..#..#..#", "#........#", "#........#", "#..#..#..#", "#..#..#..#", "#..#..#..#", "####..#..#", "#.....#...", "#.....#...", "#..####..#", "#........#", "#........#", "##########")
+
+[node name="SouthMaze" parent="Rooms" unique_id=317292529 instance=ExtResource("2_tdc43")]
+position = Vector2(900, 3700)
+room_name = "South Maze"
+size = Vector2(1200, 975)
+
+[node name="Maze" type="Node2D" parent="Rooms/SouthMaze" unique_id=2143407245]
+script = ExtResource("4_d1lip")
+layout = PackedStringArray("#######..#######", "#..#...........#", "#..#...........#", "#..#..#..####..#", "#..#..#.....#..#", "#..#..#.....#..#", "#..#######..#..#", "...#........#..#", "...#........#..#", "#..#..#######..#", "#.....#........#", "#.....#........#", "################")
+
+[node name="SwitchRoom" parent="Rooms" unique_id=1282049495 instance=ExtResource("2_tdc43")]
+position = Vector2(900, 2575)
+room_name = "Switch Room"
+size = Vector2(1200, 1125)
+
+[node name="Lab" parent="Rooms" unique_id=375366068 instance=ExtResource("2_tdc43")]
+position = Vector2(2250, 1150)
+room_name = "Lab"
+size = Vector2(1900, 1300)
+background = ExtResource("13_labart")
+
+[node name="Airlock" parent="Rooms" unique_id=166131360 instance=ExtResource("2_tdc43")]
+position = Vector2(3050, 2450)
+room_name = "Airlock"
+size = Vector2(400, 300)
+start_smoke = 0.5
+
+[node name="LiftHall" parent="Rooms" unique_id=1936516955 instance=ExtResource("2_tdc43")]
+position = Vector2(2100, 2750)
+room_name = "Lift Hall"
+size = Vector2(2050, 1700)
+
+[node name="EastMaze" parent="Rooms" unique_id=851534767 instance=ExtResource("2_tdc43")]
+position = Vector2(4150, 1150)
+room_name = "East Maze"
+size = Vector2(1650, 1650)
+
+[node name="Maze" type="Node2D" parent="Rooms/EastMaze" unique_id=60393283]
+script = ExtResource("4_d1lip")
+layout = PackedStringArray("######################", "#.....#..............#", "#.....#..............#", "####..#..####..#..#..#", "#..#..#.....#.....#..#", "#..#..#.....#.....#..#", "#..#..##########..#..#", "#..#..............#..#", "#..#..............#..#", "...#..#..#######..#..#", ".........#........#..#", "#........#........#..#", "#..#######..#..####..#", "#...........#........#", "#...........#........#", "#..#..####..##########", "#.....#.....#.....#..#", "#.....#.....#.....#..#", "#..####..#..#..#..#..#", "#........#.....#.....#", "#........#.....#.....#", "#############..#######")
+
+[node name="Passage" parent="Rooms" unique_id=365335876 instance=ExtResource("2_tdc43")]
+position = Vector2(4150, 3200)
+room_name = "Passage"
+size = Vector2(550, 250)
+
+[node name="VentRoom" parent="Rooms" unique_id=468842117 instance=ExtResource("2_tdc43")]
+position = Vector2(4700, 2800)
+room_name = "Vent Room"
+size = Vector2(1100, 1650)
+
+[node name="Doors" type="Node2D" parent="." unique_id=515967062]
+
+[node name="Door1" parent="Doors" unique_id=299295360 instance=ExtResource("5_o3rdr")]
+position = Vector2(1200, 1150)
+stretch_art = true
+solid = false
+
+[node name="Door2" parent="Doors" unique_id=1012880640 instance=ExtResource("5_o3rdr")]
+position = Vector2(2250, 2200)
+start_open = true
+stretch_art = true
+solid = false
+
+[node name="Door3" parent="Doors" unique_id=1645553584 instance=ExtResource("5_o3rdr")]
+position = Vector2(525, 2575)
+start_open = true
+stretch_art = true
+solid = false
+
+[node name="Door4" parent="Doors" unique_id=312044063 instance=ExtResource("5_o3rdr")]
+position = Vector2(1425, 2575)
+stretch_art = true
+solid = false
+
+[node name="Door5" parent="Doors" unique_id=501853634 instance=ExtResource("5_o3rdr")]
+position = Vector2(900, 4300)
+start_open = true
+stretch_art = true
+solid = false
+
+[node name="Door6" parent="Doors" unique_id=202464204 instance=ExtResource("5_o3rdr")]
+position = Vector2(1500, 3700)
+start_open = true
+stretch_art = true
+solid = false
+
+[node name="Door7" parent="Doors" unique_id=1383781477 instance=ExtResource("5_o3rdr")]
+position = Vector2(2100, 3100)
+stretch_art = true
+solid = false
+
+[node name="Door8" parent="Doors" unique_id=1962218982 instance=ExtResource("5_o3rdr")]
+position = Vector2(3250, 2450)
+stretch_art = true
+solid = false
+
+[node name="Door9" parent="Doors" unique_id=89620058 instance=ExtResource("5_o3rdr")]
+position = Vector2(3250, 2750)
+stretch_art = true
+solid = false
+
+[node name="Door10" parent="Doors" unique_id=1163121140 instance=ExtResource("5_o3rdr")]
+position = Vector2(4150, 1900)
+stretch_art = true
+solid = false
+
+[node name="Door11" parent="Doors" unique_id=802642199 instance=ExtResource("5_o3rdr")]
+position = Vector2(4150, 3325)
+start_open = true
+stretch_art = true
+solid = false
+
+[node name="Door12" parent="Doors" unique_id=1302009719 instance=ExtResource("5_o3rdr")]
+position = Vector2(4700, 3325)
+start_open = true
+stretch_art = true
+solid = false
+
+[node name="Door13" parent="Doors" unique_id=407397220 instance=ExtResource("5_o3rdr")]
+position = Vector2(5200, 2800)
+stretch_art = true
+solid = false
+
+[node name="Objects" type="Node2D" parent="." unique_id=1160109833]
+
+[node name="SmokeSource1" parent="Objects" unique_id=2071586820 instance=ExtResource("7_vmerw")]
+position = Vector2(3190, 1520)
+footprint = Vector2(210, 210)
+hide_art = true
+solid_scale = Vector2(0.6, 0.4)
+
+[node name="Vent1" parent="Objects" unique_id=1456957902 instance=ExtResource("9_sibhc")]
+position = Vector2(5200, 2650)
+start_on = false
+solid = false
+
+[node name="Exit1" parent="Objects" unique_id=886491966 instance=ExtResource("11_fy4m5")]
+position = Vector2(3850, 4250)
+solid = false
+
+[node name="PlayerStart" type="Marker2D" parent="." unique_id=469064192]
+position = Vector2(1500, 3140)

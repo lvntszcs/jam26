@@ -15,17 +15,20 @@ var _state := State.PLAYING
 
 
 func _ready() -> void:
-	load_level(0)
+	# A level placed directly in this scene (so the map shows in the editor) is played first.
+	# Restarts reload it fresh from `levels`.
+	load_level(0, get_node_or_null("Level") as Level)
 
 
-func load_level(index: int) -> void:
+func load_level(index: int, placed: Level = null) -> void:
 	Haptics.stop()
 	if _level:
 		remove_child(_level)
 		_level.queue_free()
 	_index = index
-	_level = levels[index].instantiate()
-	add_child(_level)
+	_level = placed if placed else levels[index].instantiate()
+	if not placed:
+		add_child(_level)
 	_level.completed.connect(_on_level_completed)
 	_level.failed.connect(_on_level_failed)
 	_level.prompt_changed.connect(hud.set_prompt)
