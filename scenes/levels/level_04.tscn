@@ -10,6 +10,9 @@
 [ext_resource type="Texture2D" path="res://art/rooms/switch_room.webp" id="15_switchart"]
 [ext_resource type="Texture2D" path="res://art/rooms/vent_duct.webp" id="16_ductart"]
 [ext_resource type="Texture2D" path="res://art/rooms/control_room.webp" id="17_controlart"]
+[ext_resource type="Texture2D" path="res://art/rooms/north_maze.webp" id="18_northart"]
+[ext_resource type="Texture2D" path="res://art/rooms/west_maze.webp" id="19_westart"]
+[ext_resource type="Texture2D" path="res://art/rooms/south_maze.webp" id="20_southart"]
 [ext_resource type="Script" uid="uid://d4r8q4so8tex" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 
 [node name="Level" type="Node2D" unique_id=1452852674]
@@ -21,43 +24,54 @@ camera_zoom = 0.9
 [node name="Rooms" type="Node2D" parent="." unique_id=1249259085]
 
 [node name="ControlRoom" parent="Rooms" unique_id=112103507 instance=ExtResource("2_tdc43")]
-position = Vector2(343, 150)
+position = Vector2(343, -388)
 room_name = "Control Room"
 size = Vector2(1414, 1000)
 background = ExtResource("17_controlart")
 
 [node name="NorthMaze" parent="Rooms" unique_id=1456214974 instance=ExtResource("2_tdc43")]
-position = Vector2(150, 1150)
+position = Vector2(-584, 612)
 room_name = "North Maze"
-size = Vector2(2100, 1425)
+size = Vector2(2834, 1872)
+background = ExtResource("18_northart")
 
 [node name="Maze" type="Node2D" parent="Rooms/NorthMaze" unique_id=438318916]
 script = ExtResource("4_d1lip")
-layout = PackedStringArray("#############..#############", "#..#.......................#", "#..#.......................#", "#..####..################..#", "#.....#.....#...........#..#", "#.....#.....#...........#..#", "####..#..#..#######..####..#", "#..#..#...........#........#", "#..#..#...........#........#", "#..#..#..####..#..#..#######", "#..#..#..#.....#..#........#", "#..#..#..#.....#..#........#", "#..#..####..#..#..#######..#", "#..#...........#.....#..#...", "#..#...........#.....#..#...", "#..##########..####..#..#..#", "#....................#.....#", "#....................#.....#", "####..##########..##########")
+cell_size = 10.0
+from_painting = true
 
 [node name="WestMaze" parent="Rooms" unique_id=1679385078 instance=ExtResource("2_tdc43")]
-position = Vector2(150, 2575)
+position = Vector2(-584, 2484)
 room_name = "West Maze"
-size = Vector2(750, 2100)
+size = Vector2(858, 1040)
+background = ExtResource("19_westart")
 
 [node name="Maze" type="Node2D" parent="Rooms/WestMaze" unique_id=2019537700]
 script = ExtResource("4_d1lip")
-layout = PackedStringArray("####..####", "#........#", "#........#", "#######..#", "#.....#..#", "#.....#..#", "#..#..#..#", "#..#..#..#", "#..#..#..#", "#..####..#", "#..#.....#", "#..#.....#", "#..#..####", "#..#.....#", "#..#.....#", "#..#..#..#", "#........#", "#........#", "#..#..#..#", "#..#..#..#", "#..#..#..#", "####..#..#", "#.....#...", "#.....#...", "#..####..#", "#........#", "#........#", "##########")
+cell_size = 10.0
+from_painting = true
 
 [node name="SouthMaze" parent="Rooms" unique_id=317292529 instance=ExtResource("2_tdc43")]
-position = Vector2(900, 3700)
+position = Vector2(-584, 3524)
 room_name = "South Maze"
-size = Vector2(1200, 975)
+size = Vector2(2262, 1040)
+background = ExtResource("20_southart")
 
 [node name="Maze" type="Node2D" parent="Rooms/SouthMaze" unique_id=2143407245]
 script = ExtResource("4_d1lip")
-layout = PackedStringArray("#######..#######", "#..#...........#", "#..#...........#", "#..#..#..####..#", "#..#..#.....#..#", "#..#..#.....#..#", "#..#######..#..#", "...#........#..#", "...#........#..#", "#..#..#######..#", "#.....#........#", "#.....#........#", "################")
+cell_size = 10.0
+from_painting = true
 
 [node name="SwitchRoom" parent="Rooms" unique_id=1282049495 instance=ExtResource("2_tdc43")]
-position = Vector2(900, 2575)
+position = Vector2(638, 2484)
 room_name = "Switch Room"
-size = Vector2(1200, 1125)
+size = Vector2(1040, 1040)
 background = ExtResource("15_switchart")
+
+[node name="SwitchPassage" parent="Rooms" instance=ExtResource("2_tdc43")]
+position = Vector2(1678, 2950)
+room_name = "Switch Passage"
+size = Vector2(422, 250)
 
 [node name="ComputerRoom" parent="Rooms" unique_id=375366068 instance=ExtResource("2_tdc43")]
 position = Vector2(2250, 1150)
@@ -100,41 +114,35 @@ size = Vector2(1100, 1650)
 [node name="Doors" type="Node2D" parent="." unique_id=515967062]
 
 [node name="Door1" parent="Doors" unique_id=299295360 instance=ExtResource("5_o3rdr")]
-position = Vector2(1200, 1150)
+position = Vector2(634, 612)
 stretch_art = true
 solid = false
 
 [node name="Door2" parent="Doors" unique_id=1012880640 instance=ExtResource("5_o3rdr")]
-position = Vector2(2250, 2200)
+position = Vector2(2250, 2379)
 start_open = true
 stretch_art = true
 solid = false
 
 [node name="Door3" parent="Doors" unique_id=1645553584 instance=ExtResource("5_o3rdr")]
-position = Vector2(525, 2575)
+position = Vector2(144, 2484)
 start_open = true
 stretch_art = true
 solid = false
 
 [node name="Door4" parent="Doors" unique_id=312044063 instance=ExtResource("5_o3rdr")]
-position = Vector2(1425, 2575)
+position = Vector2(1570, 2484)
 stretch_art = true
 solid = false
 
 [node name="Door5" parent="Doors" unique_id=501853634 instance=ExtResource("5_o3rdr")]
-position = Vector2(900, 4300)
-start_open = true
-stretch_art = true
-solid = false
-
-[node name="Door6" parent="Doors" unique_id=202464204 instance=ExtResource("5_o3rdr")]
-position = Vector2(1500, 3700)
+position = Vector2(26, 3524)
 start_open = true
 stretch_art = true
 solid = false
 
 [node name="Door7" parent="Doors" unique_id=1383781477 instance=ExtResource("5_o3rdr")]
-position = Vector2(2100, 3100)
+position = Vector2(2100, 3075)
 stretch_art = true
 solid = false
 
@@ -149,7 +157,7 @@ stretch_art = true
 solid = false
 
 [node name="Door10" parent="Doors" unique_id=1163121140 instance=ExtResource("5_o3rdr")]
-position = Vector2(4150, 1830)
+position = Vector2(4150, 1854)
 stretch_art = true
 solid = false
 
@@ -166,119 +174,125 @@ stretch_art = true
 solid = false
 
 [node name="Door13" parent="Doors" unique_id=407397220 instance=ExtResource("5_o3rdr")]
-position = Vector2(5305, 2800)
+position = Vector2(5281, 2800)
+stretch_art = true
+solid = false
+
+[node name="Door14" parent="Doors" instance=ExtResource("5_o3rdr")]
+position = Vector2(1678, 3075)
+start_open = true
 stretch_art = true
 solid = false
 
 [node name="Gas" type="Node2D" parent="." unique_id=1058568288]
 
 [node name="ControlRoomGas" type="Node2D" parent="Gas"]
-position = Vector2(343, 150)
+position = Vector2(343, -388)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(1414, 1000)
 
 [node name="NorthMazeTopGas" type="Node2D" parent="Gas"]
-position = Vector2(150, 1150)
+position = Vector2(-584, 612)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(2100, 350)
+size = Vector2(2834, 460)
 
 [node name="NorthMazeWestGas" type="Node2D" parent="Gas"]
-position = Vector2(150, 1500)
+position = Vector2(-584, 1072)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(225, 300)
+size = Vector2(304, 394)
 
 [node name="NorthMazeMediumGas" type="Node2D" parent="Gas"]
-position = Vector2(375, 1500)
+position = Vector2(-280, 1072)
 script = ExtResource("gas_zone")
 strength = 1
-size = Vector2(600, 300)
+size = Vector2(810, 394)
 
 [node name="NorthMazeEastGas" type="Node2D" parent="Gas"]
-position = Vector2(975, 1500)
+position = Vector2(529, 1072)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(1275, 525)
+size = Vector2(1721, 690)
 
 [node name="NorthMazeSouthWestGas" type="Node2D" parent="Gas"]
-position = Vector2(150, 1800)
+position = Vector2(-584, 1466)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(525, 775)
+size = Vector2(709, 1018)
 
 [node name="NorthMazeMediumStripGas" type="Node2D" parent="Gas"]
-position = Vector2(675, 1800)
+position = Vector2(125, 1466)
 script = ExtResource("gas_zone")
 strength = 1
-size = Vector2(300, 775)
+size = Vector2(405, 1018)
 
 [node name="NorthMazeMediumBandGas" type="Node2D" parent="Gas"]
-position = Vector2(975, 2025)
+position = Vector2(529, 1762)
 script = ExtResource("gas_zone")
 strength = 1
-size = Vector2(675, 150)
+size = Vector2(911, 197)
 
 [node name="NorthMazeSouthEastGas" type="Node2D" parent="Gas"]
-position = Vector2(1650, 2025)
+position = Vector2(1440, 1762)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(600, 550)
+size = Vector2(810, 722)
 
 [node name="SwitchCorridorGas" type="Node2D" parent="Gas"]
-position = Vector2(975, 2175)
+position = Vector2(529, 1958)
 script = ExtResource("gas_zone")
 strength = 0
-size = Vector2(675, 400)
+size = Vector2(911, 526)
 
 [node name="WestMazeGas" type="Node2D" parent="Gas"]
-position = Vector2(150, 2575)
+position = Vector2(-584, 2484)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(375, 950)
+size = Vector2(429, 470)
 
 [node name="WestMazeMediumGas" type="Node2D" parent="Gas"]
-position = Vector2(525, 2575)
+position = Vector2(-155, 2484)
 script = ExtResource("gas_zone")
 strength = 1
-size = Vector2(375, 950)
+size = Vector2(429, 470)
 
 [node name="WestMazeSouthGas" type="Node2D" parent="Gas"]
-position = Vector2(150, 3525)
+position = Vector2(-584, 2954)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(750, 1150)
+size = Vector2(858, 570)
 
 [node name="SouthMazeTopGas" type="Node2D" parent="Gas"]
-position = Vector2(900, 3700)
+position = Vector2(-584, 3524)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(1200, 200)
+size = Vector2(2262, 214)
 
 [node name="SouthMazeWestGas" type="Node2D" parent="Gas"]
-position = Vector2(900, 3900)
+position = Vector2(-584, 3738)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(300, 775)
+size = Vector2(565, 826)
 
 [node name="SouthMazeMediumGas" type="Node2D" parent="Gas"]
-position = Vector2(1200, 3900)
+position = Vector2(-19, 3738)
 script = ExtResource("gas_zone")
 strength = 1
-size = Vector2(750, 225)
+size = Vector2(1413, 240)
 
 [node name="SouthMazeEastGas" type="Node2D" parent="Gas"]
-position = Vector2(1950, 3900)
+position = Vector2(1396, 3738)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(150, 775)
+size = Vector2(282, 826)
 
 [node name="SouthMazeBottomGas" type="Node2D" parent="Gas"]
-position = Vector2(1200, 4125)
+position = Vector2(-19, 3978)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(750, 550)
+size = Vector2(1413, 586)
 
 [node name="ComputerRoomLowGas" type="Node2D" parent="Gas"]
 position = Vector2(2850, 1150)
@@ -325,7 +339,7 @@ size = Vector2(375, 150)
 [node name="Objects" type="Node2D" parent="." unique_id=1160109833]
 
 [node name="Vent1" parent="Objects" unique_id=1456957902 instance=ExtResource("9_sibhc")]
-position = Vector2(5305, 2650)
+position = Vector2(5281, 2650)
 start_on = false
 solid = false
 
