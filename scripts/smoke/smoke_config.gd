@@ -54,7 +54,7 @@ enum AlphaSource {
 @export_range(0.0, 1.0) var medium_density := 0.65
 @export_range(0.0, 1.0) var strong_density := 1.0
 ## Width in world pixels of the soft fade at a gas zone's edges. Only changes the look.
-@export var edge_fade := 80.0
+@export var edge_fade := 0.0
 ## How fast a running vent clears its room's gas, and how fast the gas returns once it stops:
 ## the fraction of the gas cleared per second (1 = one second).
 @export var clear_speed := 0.5

@@ -98,7 +98,7 @@ Level node's **Smoke Config**):
 | `drift` | Slow slide of the texture, in world pixels per second. |
 | `edge_breakup`, `edge_softness` | How ragged thin smoke looks (0 = plain fade), and how soft those ragged edges are. |
 | `edge_mask_size` | World size of one repeat of the edge mask. Larger = bigger, calmer billows. |
-| `edge_fade` | Width of the soft fade at a gas zone's edges. |
+| `edge_fade` | Width of a soft fade at a gas zone's edges. 0 (the default) fills zones right up to their edges, so neighbouring zones join without a gap. |
 | `low_density`, `medium_density`, `strong_density` | How thick each gas strength looks. This is also how dangerous it is. |
 | `clear_speed` | How fast a running vent clears its room's gas, and how fast it returns. |
 
