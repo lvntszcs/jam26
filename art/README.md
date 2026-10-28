@@ -39,8 +39,7 @@ level, in world pixels), keeping the aspect ratio. Doors stretch to fill theirs.
 
 | Slot | Notes |
 |------|-------|
-| `player_down` / `player_up` | |
-| `player_side` | Draw facing **right**. It's flipped for left. |
+| `player_sheet` | Spritesheet of the player seen from above (`art/characters/player_sheet.webp`). Draw the character facing **up**: the game rotates it toward where it walks. Frames are a grid read left to right, top to bottom. Set `player_sheet_columns` / `player_sheet_rows`, `player_idle_frame` and the walk-cycle order in `player_walk_frames`. `player_walk_fps` is the cycle speed at full walking speed (it slows down as the player slows). If the art faces another way, set `player_art_angle` (-90 = up, 0 = right, 90 = down). The frame size is fitted into the Player's `footprint` (`scenes/entities/player.tscn`). |
 | `door_closed` / `door_open` | Draw for a **horizontal** wall: width = the opening, height = the wall depth. It's rotated 90° in vertical walls. Use transparency so the room shows through an open door. |
 | `vent_on` / `vent_off` | A running vent spins its sprite. Set `spin_speed = 0` on the vent to stop that. |
 | `smoke_source` | Pulses. Set `pulse_amount = 0` to stop. |

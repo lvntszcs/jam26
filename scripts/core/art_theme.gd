@@ -9,10 +9,19 @@ extends Resource
 const ACTIVE_PATH := "res://art/art_theme.tres"
 
 @export_group("Player")
-@export var player_down: Texture2D
-@export var player_up: Texture2D
-## Facing right. Flipped horizontally for facing left.
-@export var player_side: Texture2D
+## The player seen from above, as a grid of equally sized frames, read left to right and
+## top to bottom (frame 0 is the top-left). The sprite is rotated to face where it walks.
+@export var player_sheet: Texture2D
+@export var player_sheet_columns := 2
+@export var player_sheet_rows := 2
+## Frame shown while standing still.
+@export var player_idle_frame := 0
+## Frames of the walk cycle, in playback order.
+@export var player_walk_frames := PackedInt32Array([0, 1, 2, 3])
+## Walk-cycle frames per second at full walking speed.
+@export var player_walk_fps := 8.0
+## Which way the character faces in the art, in degrees: -90 = up, 0 = right, 90 = down.
+@export var player_art_angle := -90.0
 
 @export_group("Objects")
 ## Drawn for a door in a horizontal wall; rotated 90 degrees for vertical walls.

@@ -9,8 +9,10 @@ signal died
 @export var speed := 300.0
 @export var acceleration := 2400.0
 @export var friction := 2800.0
-## Size in world pixels that the player art is fitted into.
-@export var footprint := Vector2(72, 72)
+## Size in world pixels that one spritesheet frame is fitted into.
+@export var footprint := Vector2(110, 110)
+## How quickly the sprite turns toward the walking direction (higher = snappier).
+@export var turn_speed := 14.0
 ## How close (from the player's centre) an object must be to interact with it.
 @export var interact_range := 120.0
 @export var max_air := 100.0
@@ -24,6 +26,7 @@ var level: Level
 var facing := Vector2.DOWN
 var air := 0.0
 var is_active := true
+var _walk_time := 0.0
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var camera: Camera2D = $Camera
@@ -32,7 +35,7 @@ var is_active := true
 
 func _ready() -> void:
 	air = max_air
-	_refresh_visual()
+	_setup_sprite()
 	air_changed.emit(air, max_air)
 
 
@@ -45,11 +48,9 @@ func _physics_process(delta: float) -> void:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	else:
 		velocity = velocity.move_toward(input * speed, acceleration * delta)
-		if _direction_of(input) != _direction_of(facing):
-			facing = input
-			_refresh_visual()
 		facing = input
 	move_and_slide()
+	_animate(delta)
 	_breathe(delta)
 
 
@@ -74,23 +75,29 @@ func _breathe(delta: float) -> void:
 		died.emit()
 
 
-## Snaps a vector to the main direction it points in: up, down, left or right.
-func _direction_of(vector: Vector2) -> Vector2i:
-	if absf(vector.x) > absf(vector.y):
-		return Vector2i(int(signf(vector.x)), 0)
-	return Vector2i(0, int(signf(vector.y)))
-
-
-func _refresh_visual() -> void:
+func _setup_sprite() -> void:
 	var art := ArtTheme.active()
-	var direction := _direction_of(facing)
-	var texture: Texture2D = art.player_side
-	if direction == Vector2i.UP:
-		texture = art.player_up
-	elif direction == Vector2i.DOWN:
-		texture = art.player_down
-	sprite.texture = texture
-	sprite.flip_h = direction == Vector2i.LEFT
-	if texture:
-		var fit := footprint / texture.get_size()
+	sprite.texture = art.player_sheet
+	sprite.hframes = art.player_sheet_columns
+	sprite.vframes = art.player_sheet_rows
+	sprite.frame = art.player_idle_frame
+	if art.player_sheet:
+		var frame_size := art.player_sheet.get_size() / Vector2(art.player_sheet_columns, art.player_sheet_rows)
+		var fit := footprint / frame_size
 		sprite.scale = Vector2.ONE * minf(fit.x, fit.y)
+	sprite.rotation = facing.angle() - deg_to_rad(art.player_art_angle)
+
+
+## Turns the sprite toward the walking direction and steps through the walk cycle at a rate
+## that follows the current speed, so the feet don't slide.
+func _animate(delta: float) -> void:
+	var art := ArtTheme.active()
+	var target := facing.angle() - deg_to_rad(art.player_art_angle)
+	sprite.rotation = lerp_angle(sprite.rotation, target, minf(1.0, turn_speed * delta))
+	var pace := velocity.length() / speed
+	if pace < 0.1 or art.player_walk_frames.is_empty():
+		_walk_time = 0.0
+		sprite.frame = art.player_idle_frame
+		return
+	_walk_time += delta * art.player_walk_fps * pace
+	sprite.frame = art.player_walk_frames[int(_walk_time) % art.player_walk_frames.size()]
