@@ -138,27 +138,30 @@ func _check_level(scene: PackedScene) -> void:
 	level.free()
 
 
-## Locked doors stay shut without a good enough keycard, the level's keycards are enough to
-## open every one of them, and they open afterwards. Leaves the player with those keycards.
+## Locked doors and exits stay shut without a good enough keycard, the level's keycard
+## stations (used in order) are enough for all of them, and they open afterwards.
+## Leaves the player with the highest keycard.
 func _check_keycards(level: Level, level_name: String) -> void:
 	var player := level.player
 	var locked := level.doors.filter(func(d: Door) -> bool: return d.is_locked() and not d.is_open)
+	var exits := level.objects.filter(func(o: GameObject) -> bool: return o is Exit)
 	for door: Door in locked:
 		door.interact(player)
 		_expect(not door.is_open, level_name, "%s stays shut without a keycard" % door.name)
-	var cards := level.objects.filter(func(o: GameObject) -> bool: return o is Keycard)
-	for card: Keycard in cards:
-		card.interact(player)
-		_expect(not card in level.objects, level_name, "%s is gone once picked up" % card.name)
+	for exit: Exit in exits:
+		if exit.required_keycard > 0:
+			_expect(not exit.can_leave(player), level_name, "%s is locked without a keycard" % exit.name)
+	var stations := level.objects.filter(func(o: GameObject) -> bool: return o is KeycardStation)
+	stations.sort_custom(func(a: KeycardStation, b: KeycardStation) -> bool: return a.requires_level < b.requires_level)
+	for station: KeycardStation in stations:
+		station.interact(player)
+		_expect(player.keycard_level >= station.gives_level, level_name, "%s gives keycard level %d" % [station.name, station.gives_level])
 	for door: Door in locked:
-		_expect(player.keycard_level >= door.required_keycard, level_name,
-			"a keycard in the level opens %s" % door.name)
 		door.interact(player)
 		_expect(door.is_open and not door.is_locked(), level_name, "%s opens with the keycard" % door.name)
 		door.interact(player)
-	var before := player.keycard_level
-	player.upgrade_keycard()
-	_expect(player.keycard_level == before + 1 or before == 0, level_name, "keycard upgrades one level")
+	for exit: Exit in exits:
+		_expect(exit.can_leave(player), level_name, "the level's keycards unlock %s" % exit.name)
 
 
 func _check_damage_feedback(level: Level, level_name: String) -> void:

@@ -13,7 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://36c470vx1eib" path="res://art/rooms/north_maze.webp" id="18_northart"]
 [ext_resource type="Texture2D" uid="uid://dkyautgjnmxgg" path="res://art/rooms/west_maze.webp" id="19_westart"]
 [ext_resource type="Texture2D" uid="uid://dqdve532c4xok" path="res://art/rooms/south_maze.webp" id="20_southart"]
-[ext_resource type="PackedScene" path="res://scenes/entities/keycard.tscn" id="16_keycard"]
+[ext_resource type="PackedScene" path="res://scenes/entities/keycard_station.tscn" id="16_keycard"]
 [ext_resource type="Script" uid="uid://d4r8q4so8tex" path="res://scripts/smoke/gas_zone.gd" id="gas_zone"]
 
 [node name="Level" type="Node2D" unique_id=1452852674]
@@ -341,11 +341,18 @@ solid = false
 
 [node name="Exit1" parent="Objects" unique_id=886491966 instance=ExtResource("11_fy4m5")]
 position = Vector2(3850, 4250)
+required_keycard = 2
 solid = false
 
-[node name="Keycard1" parent="Objects" instance=ExtResource("16_keycard")]
-position = Vector2(2977, 1527)
+[node name="ComputerTerminal" parent="Objects" instance=ExtResource("16_keycard")]
+position = Vector2(2440, 1606)
 hide_art = true
+
+[node name="KeycardUpgrader" parent="Objects" instance=ExtResource("16_keycard")]
+position = Vector2(884, -98)
+hide_art = true
+requires_level = 1
+gives_level = 2
 
 [node name="PlayerStart" type="Marker2D" parent="." unique_id=469064192]
 position = Vector2(3121, 3649)
