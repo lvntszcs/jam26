@@ -8,9 +8,6 @@ extends Resource
 
 const ACTIVE_PATH := "res://art/art_theme.tres"
 
-## Frames cut out of smoke sheets, keyed by sheet and layout, so each sheet is sliced only once.
-static var _sliced_sheets := {}
-
 @export_group("Rooms")
 ## Painting used for every room that has no `background` of its own. It's stretched over the
 ## room, so it looks best on rooms with the same aspect ratio (1000x700 for a 2000x1400 image).
@@ -39,25 +36,6 @@ static var _sliced_sheets := {}
 @export var vent_off: Texture2D
 @export var exit: Texture2D
 
-@export_group("Smoke")
-## All smoke animation frames in one image: a grid of equally sized cells, numbered left to
-## right, top to bottom (0 = top-left). Each frame must tile seamlessly: its left edge continues
-## its right edge, and its top continues its bottom. Used instead of `smoke_frames` when set.
-## Color, size on screen, speed and edges are set in res://config/smoke.tres.
-@export var smoke_sheet: Texture2D
-@export var smoke_sheet_columns := 2
-@export var smoke_sheet_rows := 2
-## Which cells of the sheet are frames, in playback order. Other cells are ignored.
-@export var smoke_sheet_frames := PackedInt32Array([0, 1])
-## The same frames as separate images, played in order and looped.
-## Only used when `smoke_sheet` is empty.
-@export var smoke_frames: Array[Texture2D] = []
-## Optional tileable mask that decides where thinning smoke breaks up: the most opaque areas
-## of the mask (and of the frames themselves, such as outlines) stay longest. Use it when the
-## frames have large evenly opaque areas, so thin smoke gets ragged edges instead of a flat fade.
-## Leave it empty to use the frames' own transparency instead.
-@export var smoke_edge_mask: Texture2D
-
 @export_group("Effects")
 ## Drawn around the object the player can interact with.
 @export var highlight: Texture2D
@@ -72,24 +50,3 @@ static func active() -> ArtTheme:
 	if _active == null:
 		_active = load(ACTIVE_PATH)
 	return _active
-
-
-## The smoke animation frames, cut from `smoke_sheet` if it is set, otherwise `smoke_frames`.
-## Sheet frames become separate textures (with mipmaps) so the shader can repeat each one.
-func smoke_animation_frames() -> Array[Texture2D]:
-	if smoke_sheet == null:
-		return smoke_frames.duplicate()
-	var key := "%s|%d|%d|%s" % [smoke_sheet.get_rid(), smoke_sheet_columns, smoke_sheet_rows, smoke_sheet_frames]
-	if not _sliced_sheets.has(key):
-		var sheet := smoke_sheet.get_image()
-		if sheet.is_compressed():
-			sheet.decompress()
-		var cell := Vector2i(sheet.get_width() / smoke_sheet_columns, sheet.get_height() / smoke_sheet_rows)
-		var frames: Array[Texture2D] = []
-		for index in smoke_sheet_frames:
-			var origin := Vector2i(index % smoke_sheet_columns, index / smoke_sheet_columns) * cell
-			var frame := sheet.get_region(Rect2i(origin, cell))
-			frame.generate_mipmaps()
-			frames.append(ImageTexture.create_from_image(frame))
-		_sliced_sheets[key] = frames
-	return _sliced_sheets[key]

@@ -3,7 +3,7 @@
 The game is drawn from two kinds of art:
 
 - **Room paintings**: one image per room, set on each `Room` node.
-- **Shared sprites**: the player, doors, vents, smoke and so on, all listed in **`art/art_theme.tres`**.
+- **Shared sprites**: the player, doors, vents and so on, all listed in **`art/art_theme.tres`**.
 
 No script points at an image directly, so swapping art never needs code changes.
 See `art/rooms/lab_reference.webp` for the target style. It's already used as the Lab in level 1.
@@ -49,55 +49,23 @@ level, in world pixels), keeping the aspect ratio. Doors stretch to fill theirs.
 | `door_closed` / `door_open` | Draw for a **horizontal** wall: width = the opening, height = the wall depth. It's rotated 90° in vertical walls. Use transparency so the room shows through an open door. |
 | `vent_on` / `vent_off` | A running vent spins its sprite. Set `spin_speed = 0` on the vent to stop that. |
 | `exit` | The escape hatch. |
-| `smoke_sheet` / `smoke_frames`, `smoke_edge_mask` | The smoke animation and where it breaks up (see **Smoke** below). |
 | `highlight` | Stretched around whatever the player can interact with. |
 
-## Smoke
+## Gas
 
-Gas is drawn as one **tileable texture** repeated across each gas zone, animated by swapping between its
-frames. No edge tiles are needed: where smoke thins out, only the texture's thickest parts stay
-visible, so the edge of a cloud takes its ragged shape from the texture itself.
-
-**Painting the frames**
-
-- Every frame must **tile seamlessly**: the left edge continues the right edge, and the top
-  continues the bottom. All frames should be the same size and show the same smoke in slightly
-  different shapes, so swapping between them reads as movement (a "boil").
-- Use opacity to show how thick the smoke is. Its most opaque parts (like outlines) are the
-  last to disappear when smoke thins. If the frames come white-on-black with no transparency
-  instead, set `alpha_source` to *Luminance* in the smoke settings.
-- Paint it in color and keep `tint` white, or paint it white/grey and let `tint` color it.
-
-**Plugging them in:** open `art/art_theme.tres`. The current art is a sheet,
-`art/effects/smoke_sheet.webp`: a 2×2 grid of 1000 px cells, using the top-left and top-right
-cells as frames. The bottom row is a tiling preview and is ignored.
-
-- **One image with all frames:** put it in **Smoke Sheet**, set **Smoke Sheet Columns / Rows**
-  to its grid, and list the cells to play, in order, in **Smoke Sheet Frames** (0 = top-left,
-  counting left to right, then down).
-- **Separate images:** clear **Smoke Sheet** and put the frames, in order, into **Smoke Frames**.
-
-Any number of frames works.
-
-**Edge mask:** large evenly see-through areas (like this art's mauve fill) would otherwise fade
-out flatly. **Smoke Edge Mask** (`art/effects/smoke_edge_mask.png`, soft noise) breaks thin
-smoke into ragged billows instead, while the art's own outlines stay visible as wisps. The
-artist can paint a replacement: a tileable image whose most opaque areas are where the smoke
-should hold on longest. Clear the slot to use only the frames' own transparency.
-
-**Tuning:** everything else is in **`config/smoke.tres`** (a level can use its own through its
-Level node's **Smoke Config**):
+The gas needs no art: a shader (`scripts/smoke/smoke.gdshader`) draws it as slowly swirling
+noise, the same everywhere in the world, so neighbouring gas zones join seamlessly. Thin gas
+breaks into ragged wisps instead of fading evenly. Everything about its look is in
+**`config/smoke.tres`** (a level can use its own through its Level node's **Smoke Config**):
 
 | Setting | Effect |
 |---------|--------|
-| `tint`, `opacity`, `thickness` | Color, how opaque Strong gas is, and a multiplier on the frames' own opacity (raise it if the smoke looks see-through). |
-| `tile_size` | World size of one texture repeat (a room is about 1000 wide). |
-| `alpha_source` | Read thickness from the frames' transparency or brightness. |
-| `frame_rate` | Frames per second. |
-| `crossfade` | 0 = frames swap instantly (hand-drawn boil), 1 = they blend smoothly. |
-| `drift` | Slow slide of the texture, in world pixels per second. |
-| `edge_breakup`, `edge_softness` | How ragged thin smoke looks (0 = plain fade), and how soft those ragged edges are. |
-| `edge_mask_size` | World size of one repeat of the edge mask. Larger = bigger, calmer billows. |
+| `color`, `highlight_color`, `highlight_amount` | Color of the gas body, of its brightest wisps, and how much of the gas gets the wisp color. |
+| `opacity` | How opaque Strong gas is. |
+| `noise_scale` | World size of one large billow (a small room is about 1000 wide). |
+| `drift` | Slow slide of the whole gas, in world pixels per second. |
+| `swirl_speed`, `warp` | How fast the billows change shape, and how strongly they curl into each other. |
+| `edge_breakup`, `edge_softness` | How ragged thin gas looks (0 = plain fade), and how soft those ragged edges are. |
 | `edge_fade` | Width of a soft fade at a gas zone's edges. 0 (the default) fills zones right up to their edges, so neighbouring zones join without a gap. |
 | `low_density`, `medium_density`, `strong_density` | How thick each gas strength looks. This is also how dangerous it is. |
 | `clear_speed` | How fast a running vent clears its room's gas, and how fast it returns. |

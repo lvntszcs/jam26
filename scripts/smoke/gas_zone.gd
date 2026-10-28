@@ -28,9 +28,6 @@ var room: Room
 var cleared := 0.0
 var _config: SmokeConfig
 var _sprite: Sprite2D
-var _frames: Array[Texture2D] = []
-var _frame_time := 0.0
-var _shown_frame := -1
 
 
 func _ready() -> void:
@@ -39,12 +36,7 @@ func _ready() -> void:
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_sprite.z_index = 3
 	add_child(_sprite, false, Node.INTERNAL_MODE_FRONT)
-	_frames = ArtTheme.active().smoke_animation_frames()
 	_refresh()
-
-
-func _process(delta: float) -> void:
-	_animate(delta)
 
 
 func rect() -> Rect2:
@@ -108,42 +100,18 @@ func _refresh() -> void:
 
 	var shader_material := ShaderMaterial.new()
 	shader_material.shader = SHADER
-	shader_material.set_shader_parameter("tint", settings.tint)
+	shader_material.set_shader_parameter("color", settings.color)
+	shader_material.set_shader_parameter("highlight_color", settings.highlight_color)
+	shader_material.set_shader_parameter("highlight_amount", settings.highlight_amount)
 	shader_material.set_shader_parameter("opacity", settings.opacity)
-	shader_material.set_shader_parameter("thickness", settings.thickness)
-	shader_material.set_shader_parameter("tile_size", settings.tile_size)
+	shader_material.set_shader_parameter("noise_scale", settings.noise_scale)
 	shader_material.set_shader_parameter("drift", settings.drift)
-	shader_material.set_shader_parameter("luminance_as_alpha", settings.alpha_source == SmokeConfig.AlphaSource.LUMINANCE)
+	shader_material.set_shader_parameter("swirl_speed", settings.swirl_speed)
+	shader_material.set_shader_parameter("warp", settings.warp)
 	shader_material.set_shader_parameter("edge_breakup", settings.edge_breakup)
 	shader_material.set_shader_parameter("edge_softness", settings.edge_softness)
-	var art := ArtTheme.active()
-	shader_material.set_shader_parameter("use_edge_mask", art.smoke_edge_mask != null)
-	shader_material.set_shader_parameter("edge_mask", art.smoke_edge_mask)
-	shader_material.set_shader_parameter("edge_mask_size", settings.edge_mask_size)
 	shader_material.set_shader_parameter("amount", 1.0 - cleared)
 	_sprite.material = shader_material
-	_sprite.visible = not _frames.is_empty()
-	_shown_frame = -1
-	if _frames.is_empty():
-		push_warning("ArtTheme has no smoke_sheet or smoke_frames; gas is invisible.")
-
-
-## Steps through the animation frames, optionally fading each into the next.
-func _animate(delta: float) -> void:
-	if _frames.is_empty() or _sprite == null:
-		return
-	var settings := _settings()
-	_frame_time += delta * settings.frame_rate
-	var index := int(_frame_time) % _frames.size()
-	if index != _shown_frame:
-		_shown_frame = index
-		_sprite.material.set_shader_parameter("frame_a", _frames[index])
-		_sprite.material.set_shader_parameter("frame_b", _frames[(index + 1) % _frames.size()])
-	var progress := fmod(_frame_time, 1.0)
-	var blend := 0.0
-	if settings.crossfade > 0.0:
-		blend = smoothstep(1.0 - settings.crossfade, 1.0, progress)
-	_sprite.material.set_shader_parameter("blend", blend)
 
 
 ## In the editor, outlines the zone and names its strength so it's easy to find and select.
