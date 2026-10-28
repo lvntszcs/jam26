@@ -2,7 +2,7 @@
 class_name Door
 extends GameObject
 ## A door between two rooms. Place it on the shared wall: footprint.x is the opening width and
-## footprint.y the depth that covers both walls. Closed doors block the player and the smoke.
+## footprint.y the depth that covers both walls. Closed doors block the player.
 ## The Level links it to the rooms on either side and works out whether the wall is vertical.
 
 signal toggled(is_open: bool)

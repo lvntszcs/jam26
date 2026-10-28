@@ -7,7 +7,6 @@
 [ext_resource type="Texture2D" path="res://art/placeholder/door_open.png" id="8_dopen"]
 [ext_resource type="Texture2D" path="res://art/placeholder/vent_on.png" id="9_von"]
 [ext_resource type="Texture2D" path="res://art/placeholder/vent_off.png" id="10_voff"]
-[ext_resource type="Texture2D" path="res://art/placeholder/smoke_source.png" id="11_source"]
 [ext_resource type="Texture2D" path="res://art/placeholder/exit.png" id="12_exit"]
 [ext_resource type="Texture2D" path="res://art/effects/smoke_sheet.webp" id="13_smoke_sheet"]
 [ext_resource type="Texture2D" path="res://art/effects/smoke_edge_mask.png" id="16_smoke_mask"]
@@ -21,7 +20,6 @@ door_closed = ExtResource("7_dclosed")
 door_open = ExtResource("8_dopen")
 vent_on = ExtResource("9_von")
 vent_off = ExtResource("10_voff")
-smoke_source = ExtResource("11_source")
 exit = ExtResource("12_exit")
 smoke_sheet = ExtResource("13_smoke_sheet")
 smoke_sheet_columns = 2

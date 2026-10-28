@@ -1,6 +1,6 @@
 shader_type canvas_item;
-// Draws a room's smoke: a tileable, animated texture repeated in world space, shown only where
-// the room's density grid (this sprite's TEXTURE, one texel per cell) says there is smoke.
+// Draws a gas zone: a tileable, animated texture repeated in world space, shown only where
+// the zone's density mask (this sprite's TEXTURE) says there is gas.
 // Thin smoke keeps only the texture's thickest parts, so clouds get ragged edges without
 // needing dedicated edge tiles.
 
@@ -11,6 +11,8 @@ uniform sampler2D frame_b : source_color, repeat_enable, filter_linear_mipmap;
 uniform sampler2D edge_mask : repeat_enable, filter_linear_mipmap;
 uniform bool use_edge_mask = false;
 uniform float edge_mask_size = 300.0;
+// Multiplies the mask's density: 1 = full gas, 0 = cleared by a vent.
+uniform float amount : hint_range(0.0, 1.0) = 1.0;
 // 0 shows frame_a, 1 shows frame_b.
 uniform float blend : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 tint : source_color = vec4(1.0);
@@ -30,7 +32,7 @@ void vertex() {
 }
 
 void fragment() {
-	float density = texture(TEXTURE, UV).r;
+	float density = texture(TEXTURE, UV).r * amount;
 	vec2 smoke_uv = (world_position - drift * TIME) / tile_size;
 	vec4 smoke = mix(texture(frame_a, smoke_uv), texture(frame_b, smoke_uv), blend);
 	float body = luminance_as_alpha ? dot(smoke.rgb, vec3(0.299, 0.587, 0.114)) : smoke.a;

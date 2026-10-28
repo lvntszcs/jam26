@@ -1,7 +1,7 @@
 @tool
 class_name GameObject
 extends Node2D
-## Base class for things placed in a level: doors, vents, smoke sources, the exit.
+## Base class for things placed in a level: doors, vents, the exit.
 ## The art is fitted into `footprint`, so it works at any resolution. Place and size objects
 ## in the editor. The Level finds them automatically and works out which room each one is in.
 ## Every object scene needs a Sprite2D child named "Sprite".
@@ -46,11 +46,6 @@ func setup(target_level: Level, target_room: Room) -> void:
 ## Texture for the current state. Override in subclasses.
 func current_texture() -> Texture2D:
 	return null
-
-
-## Gets the room's smoke level each physics frame and returns the new level.
-func affect_smoke(smoke: float, _delta: float) -> float:
-	return smoke
 
 
 ## Text shown when the player is close enough. Empty means it can't be interacted with.

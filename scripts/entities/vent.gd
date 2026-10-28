@@ -1,7 +1,8 @@
 @tool
 class_name Vent
 extends GameObject
-## An extractor fan. While running it pulls smoke out of the room it's in.
+## An extractor fan. While running it clears every GasZone in its room; switched off, the gas
+## comes back.
 
 signal toggled(is_on: bool)
 
@@ -10,8 +11,6 @@ signal toggled(is_on: bool)
 		start_on = value
 		is_on = value
 		refresh_visual()
-## Smoke removed per second from a 1000x700 room. Bigger rooms clear more slowly.
-@export var extraction_rate := 0.12
 ## Rotation speed of the sprite while running, in radians per second. 0 disables spinning.
 @export var spin_speed := 3.0
 
@@ -31,12 +30,6 @@ func _process(delta: float) -> void:
 func current_texture() -> Texture2D:
 	var art := ArtTheme.active()
 	return art.vent_on if is_on else art.vent_off
-
-
-func affect_smoke(smoke: float, delta: float) -> float:
-	if not is_on:
-		return smoke
-	return smoke - extraction_rate * delta / room.capacity()
 
 
 func interaction_prompt() -> String:

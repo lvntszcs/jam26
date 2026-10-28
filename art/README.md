@@ -28,8 +28,7 @@ To give a room its own painting:
 
 Doors cut gaps in the walls automatically. Paint the wall continuous, since the door sprite
 covers the gap. If props are painted into the room (like the lab's broken canister), place the
-matching object on top and tick **Hide Art** so only its gameplay remains. The smoke source
-in level 1 shows how.
+matching object on top and tick **Hide Art** so only its gameplay remains.
 
 Rooms without a background draw a cream placeholder with their name.
 
@@ -49,14 +48,13 @@ level, in world pixels), keeping the aspect ratio. Doors stretch to fill theirs.
 | `player_sheet` | Spritesheet of the player seen from above (`art/characters/player_sheet.webp`). Draw the character facing **up**: the game rotates it toward where it walks. Frames are a grid read left to right, top to bottom. Set `player_sheet_columns` / `player_sheet_rows`, `player_idle_frame` and the walk-cycle order in `player_walk_frames`. `player_walk_fps` is the cycle speed at full walking speed (it slows down as the player slows). If the art faces another way, set `player_art_angle` (-90 = up, 0 = right, 90 = down). The frame size is fitted into the Player's `footprint` (`scenes/entities/player.tscn`). |
 | `door_closed` / `door_open` | Draw for a **horizontal** wall: width = the opening, height = the wall depth. It's rotated 90° in vertical walls. Use transparency so the room shows through an open door. |
 | `vent_on` / `vent_off` | A running vent spins its sprite. Set `spin_speed = 0` on the vent to stop that. |
-| `smoke_source` | Pulses. Set `pulse_amount = 0` to stop. |
 | `exit` | The escape hatch. |
 | `smoke_sheet` / `smoke_frames`, `smoke_edge_mask` | The smoke animation and where it breaks up (see **Smoke** below). |
 | `highlight` | Stretched around whatever the player can interact with. |
 
 ## Smoke
 
-Smoke is one **tileable texture** repeated across each room, animated by swapping between its
+Gas is drawn as one **tileable texture** repeated across each gas zone, animated by swapping between its
 frames. No edge tiles are needed: where smoke thins out, only the texture's thickest parts stay
 visible, so the edge of a cloud takes its ragged shape from the texture itself.
 
@@ -92,7 +90,7 @@ Level node's **Smoke Config**):
 
 | Setting | Effect |
 |---------|--------|
-| `tint`, `opacity`, `thickness` | Color, how opaque a completely full room is, and a multiplier on the frames' own opacity (raise it if the smoke looks see-through). |
+| `tint`, `opacity`, `thickness` | Color, how opaque Strong gas is, and a multiplier on the frames' own opacity (raise it if the smoke looks see-through). |
 | `tile_size` | World size of one texture repeat (a room is about 1000 wide). |
 | `alpha_source` | Read thickness from the frames' transparency or brightness. |
 | `frame_rate` | Frames per second. |
@@ -100,10 +98,12 @@ Level node's **Smoke Config**):
 | `drift` | Slow slide of the texture, in world pixels per second. |
 | `edge_breakup`, `edge_softness` | How ragged thin smoke looks (0 = plain fade), and how soft those ragged edges are. |
 | `edge_mask_size` | World size of one repeat of the edge mask. Larger = bigger, calmer billows. |
-| `cell_size`, `spread_speed`, `fill_speed` | How finely and how fast smoke visibly creeps in from doors and sources and gets pulled toward vents. Smoke only passes a door once it has spread up to it, so `spread_speed` also sets how soon it reaches the next room. |
+| `edge_fade` | Width of the soft fade at a gas zone's edges. |
+| `low_density`, `medium_density`, `strong_density` | How thick each gas strength looks. This is also how dangerous it is. |
+| `clear_speed` | How fast a running vent clears its room's gas, and how fast it returns. |
 
-These only change how the smoke looks. How much smoke a room holds, and how dangerous it is,
-are set by the smoke sources, vents and doors in the level.
+Where the gas is, and which strength, is set by the GasZone nodes in each level (see
+`scenes/levels/README.md`).
 
 ## Lighting
 

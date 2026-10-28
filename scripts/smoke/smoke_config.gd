@@ -4,9 +4,8 @@ extends Resource
 ## How the smoke looks and spreads on screen. The default is res://config/smoke.tres, and a
 ## Level can use its own through its `smoke_config` property. The smoke art itself (the
 ## tileable animation frames) is `smoke_frames` in res://art/art_theme.tres.
-## Apart from `spread_speed` and `cell_size` (smoke passes a door once it has spread up to it),
-## these settings only change the visuals: how much smoke a room holds is decided by the smoke
-## sources, vents and doors.
+## Apart from the gas strengths and `clear_speed`, these settings only change the visuals.
+## Where the gas is, and which strength, is set by the GasZone nodes in each level.
 
 const DEFAULT_PATH := "res://config/smoke.tres"
 
@@ -20,13 +19,13 @@ enum AlphaSource {
 @export_group("Look")
 ## Multiplied with the frames' colors. Use white for frames that are already colored.
 @export var tint := Palette.VIOLET
-## Opacity of a room completely full of smoke.
+## Opacity of the thickest (Strong) gas.
 @export_range(0.0, 1.0) var opacity := 0.85
 ## Multiplies how opaque the frames are, as painted. 1 = as painted, 2 = twice as opaque
 ## (anything already half opaque becomes solid). Raise it when the smoke looks too see-through.
 @export_range(0.0, 4.0) var thickness := 1.0
 ## Width and height in world pixels of one repeat of the tileable texture
-## (a room is about 1000 wide).
+## (a small room is about 1000 wide).
 @export var tile_size := 360.0
 ## Which channel of the frames says how thick the smoke is.
 @export var alpha_source := AlphaSource.ALPHA
@@ -48,14 +47,17 @@ enum AlphaSource {
 ## World size of one repeat of the ArtTheme's `smoke_edge_mask`, if there is one.
 @export var edge_mask_size := 300.0
 
-@export_group("Spread")
-## Size of one cell of the on-screen density grid, in world pixels. Smaller = finer detail.
-@export var cell_size := 50.0
-## How fast smoke spreads across a room from where it comes in. Doors only let smoke through
-## once it has spread up to them, so this also sets how soon smoke reaches the next room.
-@export var spread_speed := 40.0
-## How quickly the drawn amount of smoke catches up with the room's actual smoke level.
-@export var fill_speed := 2.0
+@export_group("Gas")
+## How thick Low, Medium and Strong gas zones are (0 to 1). This is also how dangerous they are:
+## the player loses `air_loss_per_second` times this much air per second while inside.
+@export_range(0.0, 1.0) var low_density := 0.35
+@export_range(0.0, 1.0) var medium_density := 0.65
+@export_range(0.0, 1.0) var strong_density := 1.0
+## Width in world pixels of the soft fade at a gas zone's edges. Only changes the look.
+@export var edge_fade := 80.0
+## How fast a running vent clears its room's gas, and how fast the gas returns once it stops:
+## the fraction of the gas cleared per second (1 = one second).
+@export var clear_speed := 0.5
 
 
 static func load_default() -> SmokeConfig:

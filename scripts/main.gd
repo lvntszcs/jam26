@@ -10,13 +10,28 @@ enum State { PLAYING, FAILED, COMPLETED, FINISHED }
 var _index := 0
 var _level: Level
 var _state := State.PLAYING
+## Untouched copy of the level placed in this scene, including anything added to it here
+## (like gas zones), so restarts get it back exactly as edited.
+var _placed_copy: Level
 
 @onready var hud: Hud = $Hud
 
 
+func _enter_tree() -> void:
+	# Copied before the level's _ready() adds the player and other runtime nodes.
+	var placed := get_node_or_null("Level") as Level
+	if placed and _placed_copy == null:
+		_placed_copy = placed.duplicate()
+
+
+func _exit_tree() -> void:
+	if _placed_copy:
+		_placed_copy.free()
+		_placed_copy = null
+
+
 func _ready() -> void:
 	# A level placed directly in this scene (so the map shows in the editor) is played first.
-	# Restarts reload it fresh from `levels`.
 	load_level(0, get_node_or_null("Level") as Level)
 
 
@@ -26,7 +41,12 @@ func load_level(index: int, placed: Level = null) -> void:
 		remove_child(_level)
 		_level.queue_free()
 	_index = index
-	_level = placed if placed else levels[index].instantiate()
+	if placed:
+		_level = placed
+	elif index == 0 and _placed_copy:
+		_level = _placed_copy.duplicate()
+	else:
+		_level = levels[index].instantiate()
 	if not placed:
 		add_child(_level)
 	_level.completed.connect(_on_level_completed)

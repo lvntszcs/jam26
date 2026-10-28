@@ -37,7 +37,6 @@ static var _sliced_sheets := {}
 @export var door_open: Texture2D
 @export var vent_on: Texture2D
 @export var vent_off: Texture2D
-@export var smoke_source: Texture2D
 @export var exit: Texture2D
 
 @export_group("Smoke")
