@@ -22,6 +22,9 @@ enum AlphaSource {
 @export var tint := Palette.VIOLET
 ## Opacity of a room completely full of smoke.
 @export_range(0.0, 1.0) var opacity := 0.85
+## Multiplies how opaque the frames are, as painted. 1 = as painted, 2 = twice as opaque
+## (anything already half opaque becomes solid). Raise it when the smoke looks too see-through.
+@export_range(0.0, 4.0) var thickness := 1.0
 ## Width and height in world pixels of one repeat of the tileable texture
 ## (a room is about 1000 wide).
 @export var tile_size := 360.0

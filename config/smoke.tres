@@ -6,6 +6,7 @@
 script = ExtResource("1_config")
 tint = Color(1, 1, 1, 1)
 opacity = 1.0
+thickness = 2.0
 tile_size = 600.0
 alpha_source = 0
 frame_rate = 2.0
