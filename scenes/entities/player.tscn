@@ -5,7 +5,7 @@
 [ext_resource type="AudioStream" path="res://audio/sfx/one_step.wav" id="3_footstep"]
 
 [sub_resource type="CircleShape2D" id="body"]
-radius = 45.0
+radius = 32.0
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 4

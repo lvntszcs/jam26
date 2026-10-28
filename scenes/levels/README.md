@@ -31,12 +31,13 @@ and objects anywhere beneath it.
 - **Layout** is one text line per row: `#` is a wall cell, `.` is floor. **Cell Size** (75) is
   the size of one character in world pixels.
 - Keep corridors at least two cells wide, and open the cells in front of each door.
-- `level_04.tscn` has three mazes to copy from.
-- **From Painting** builds the walls from the room's painting instead: every transparent cell is
-  a wall, and nothing extra is drawn. Paint the corridors on a transparent background, so the
-  painting shows exactly where the player can go (see the vent duct, `EastMaze` in
-  `level_04.tscn`, with a Cell Size of 25). Corridors and doors must line up with the painted
-  floor.
+- **From Painting** builds the walls from the room's painting instead: every cell with any
+  transparent part is a wall (so thin painted walls block too), and nothing extra is drawn. Paint
+  the corridors on a transparent background, so the painting shows exactly where the player can
+  go. In `level_04.tscn` the left maze (`NorthMaze`, `WestMaze`, `SouthMaze`, Cell Size 10) is one
+  painting cut into three rooms, and the vent duct (`EastMaze`) is another. Where a corridor
+  crosses from one room into the next, cut the painting in the middle of the corridor and put a
+  door there, and make sure the painting's corridors reach the room edge at every door.
 
 ## Crawl spaces
 

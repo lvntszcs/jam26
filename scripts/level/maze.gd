@@ -15,8 +15,8 @@ extends Node2D
 	set(value):
 		layout = value
 		queue_redraw()
-## Build the walls from the parent Room's painting instead of `layout`: every cell whose centre
-## is transparent in the painting is a wall. The painting shows the walls, so none are drawn.
+## Build the walls from the parent Room's painting instead of `layout`: every cell with any
+## transparent part in the painting is a wall. The painting shows the walls, so none are drawn.
 @export var from_painting := false:
 	set(value):
 		from_painting = value
@@ -79,7 +79,8 @@ func _build() -> void:
 		add_child(occluder)
 
 
-## One row per cell of the parent Room: "#" where the painting is transparent, "." elsewhere.
+## One row per cell of the parent Room: "#" where any part of the cell is transparent in the
+## painting (so thin painted walls still block), "." elsewhere.
 func _layout_from_painting() -> PackedStringArray:
 	var rows := PackedStringArray()
 	var room := get_parent() as Room
@@ -91,12 +92,24 @@ func _layout_from_painting() -> PackedStringArray:
 		image.decompress()
 	var cells := Vector2i((room.size / cell_size).ceil())
 	var texel := Vector2(image.get_size()) / room.size
+	var last := Vector2(image.get_size() - Vector2i.ONE)
+	# Samples about two texels apart, spread inside each cell so neighbouring cells don't share
+	# them: lines a few texels wide are caught without widening every wall by a whole cell.
+	var samples := maxi(2, ceili(cell_size * maxf(texel.x, texel.y) / 2.0))
 	for y in cells.y:
 		var row := ""
 		for x in cells.x:
-			var point := ((Vector2(x, y) + Vector2(0.5, 0.5)) * cell_size * texel).floor()
-			point = point.clamp(Vector2.ZERO, Vector2(image.get_size() - Vector2i.ONE))
-			row += "." if image.get_pixelv(Vector2i(point)).a > 0.5 else "#"
+			var wall := false
+			for sy in samples:
+				for sx in samples:
+					var local := (Vector2(x, y) + (Vector2(sx, sy) + Vector2(0.5, 0.5)) / samples) * cell_size
+					var point := (local * texel).floor().clamp(Vector2.ZERO, last)
+					if image.get_pixelv(Vector2i(point)).a < 0.5:
+						wall = true
+						break
+				if wall:
+					break
+			row += "#" if wall else "."
 		rows.append(row)
 	return rows
 
