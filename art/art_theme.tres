@@ -8,8 +8,8 @@
 [ext_resource type="Texture2D" path="res://art/placeholder/vent_off.png" id="10_voff"]
 [ext_resource type="Texture2D" path="res://art/placeholder/smoke_source.png" id="11_source"]
 [ext_resource type="Texture2D" path="res://art/placeholder/exit.png" id="12_exit"]
-[ext_resource type="Texture2D" path="res://art/placeholder/smoke_frame_1.png" id="13_smoke1"]
-[ext_resource type="Texture2D" path="res://art/placeholder/smoke_frame_2.png" id="16_smoke2"]
+[ext_resource type="Texture2D" path="res://art/effects/smoke_sheet.webp" id="13_smoke_sheet"]
+[ext_resource type="Texture2D" path="res://art/effects/smoke_edge_mask.png" id="16_smoke_mask"]
 [ext_resource type="Texture2D" path="res://art/placeholder/highlight.png" id="14_highlight"]
 
 [resource]
@@ -21,5 +21,9 @@ vent_on = ExtResource("9_von")
 vent_off = ExtResource("10_voff")
 smoke_source = ExtResource("11_source")
 exit = ExtResource("12_exit")
-smoke_frames = Array[Texture2D]([ExtResource("13_smoke1"), ExtResource("16_smoke2")])
+smoke_sheet = ExtResource("13_smoke_sheet")
+smoke_sheet_columns = 2
+smoke_sheet_rows = 2
+smoke_sheet_frames = PackedInt32Array(0, 1)
+smoke_edge_mask = ExtResource("16_smoke_mask")
 highlight = ExtResource("14_highlight")

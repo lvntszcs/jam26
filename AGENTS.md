@@ -35,8 +35,9 @@ facility by opening and closing doors and switching vents. Each room is one pain
   simulation and interactions) and `Room` (painting, generated walls with door gaps).
 - `scripts/smoke/`: `SmokeConfig` (look and spread settings, default `config/smoke.tres`, per-level
   override via `Level.smoke_config`), `SmokeSurface` (one per room: a coarse density grid that
-  spreads smoke from entry points and drives `smoke.gdshader`, which tiles the ArtTheme's
-  `smoke_frames`). Gameplay smoke is still one level per room, and the grid only places it on screen.
+  spreads smoke from entry points and drives `smoke.gdshader`, which tiles the ArtTheme's smoke
+  frames, sliced from `smoke_sheet` by `ArtTheme.smoke_animation_frames()`, plus the optional
+  `smoke_edge_mask`). Gameplay smoke is still one level per room, and the grid only places it on screen.
 - `scripts/lighting/`: `LightingConfig` (settings, default `config/lighting.tres`, per-level override
   via `Level.lighting`), `PlayerLight` (the player's PointLight2D) and `Lighting` (occluder helpers).
   Walls and closed doors get `LightOccluder2D`s.

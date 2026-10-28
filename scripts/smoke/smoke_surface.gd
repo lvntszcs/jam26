@@ -41,7 +41,8 @@ func _ready() -> void:
 	texture = _mask
 	scale = room.size / Vector2(_columns, _rows)
 
-	_frames = ArtTheme.active().smoke_frames.duplicate()
+	var art := ArtTheme.active()
+	_frames = art.smoke_animation_frames()
 	var shader_material := ShaderMaterial.new()
 	shader_material.shader = SHADER
 	shader_material.set_shader_parameter("tint", config.tint)
@@ -51,10 +52,13 @@ func _ready() -> void:
 	shader_material.set_shader_parameter("luminance_as_alpha", config.alpha_source == SmokeConfig.AlphaSource.LUMINANCE)
 	shader_material.set_shader_parameter("edge_breakup", config.edge_breakup)
 	shader_material.set_shader_parameter("edge_softness", config.edge_softness)
+	shader_material.set_shader_parameter("use_edge_mask", art.smoke_edge_mask != null)
+	shader_material.set_shader_parameter("edge_mask", art.smoke_edge_mask)
+	shader_material.set_shader_parameter("edge_mask_size", config.edge_mask_size)
 	material = shader_material
 	visible = not _frames.is_empty()
 	if _frames.is_empty():
-		push_warning("ArtTheme has no smoke_frames; smoke is invisible.")
+		push_warning("ArtTheme has no smoke_sheet or smoke_frames; smoke is invisible.")
 	_upload()
 
 

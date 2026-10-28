@@ -41,6 +41,8 @@ enum AlphaSource {
 @export_range(0.0, 1.0) var edge_breakup := 0.7
 ## Softness of those ragged edges.
 @export_range(0.01, 1.0) var edge_softness := 0.25
+## World size of one repeat of the ArtTheme's `smoke_edge_mask`, if there is one.
+@export var edge_mask_size := 300.0
 
 @export_group("Spread")
 ## Size of one cell of the on-screen density grid, in world pixels. Smaller = finer detail.
