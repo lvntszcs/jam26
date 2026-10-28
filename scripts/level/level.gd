@@ -30,6 +30,7 @@ var is_finished := false
 var _prompt := ""
 var _focus: GameObject
 var _highlight: Sprite2D
+var _smoke_surfaces := {}
 
 
 func _ready() -> void:
@@ -83,12 +84,27 @@ func bounds() -> Rect2:
 	return result
 
 
+## How thick the smoke is in `room` right next to `door`.
+func doorway_smoke(door: Door, room: Room) -> float:
+	var surface: SmokeSurface = _smoke_surfaces.get(room)
+	return surface.density_at(door.global_position) if surface else room.smoke
+
+
+## 0 to 1: how freely smoke leaves `source` through `door`. Smoke only passes through once the
+## drawn smoke has spread up to the door, and fully once it is as thick there as the room average.
+func _doorway_gate(door: Door, source: Room) -> float:
+	if source.smoke <= 0.0:
+		return 0.0
+	return minf(1.0, doorway_smoke(door, source) / source.smoke)
+
+
 func step_smoke(delta: float) -> void:
 	for door in doors:
 		if door.is_open and door.rooms.size() == 2:
 			var a := door.rooms[0]
 			var b := door.rooms[1]
-			var flow := door_flow * (a.smoke - b.smoke) * delta
+			var source := a if a.smoke > b.smoke else b
+			var flow := door_flow * (a.smoke - b.smoke) * delta * _doorway_gate(door, source)
 			a.smoke -= flow / a.capacity()
 			b.smoke += flow / b.capacity()
 	for object in objects:
@@ -96,6 +112,8 @@ func step_smoke(delta: float) -> void:
 			object.room.smoke = object.affect_smoke(object.room.smoke, delta)
 	for room in rooms:
 		room.smoke = clampf(room.smoke, 0.0, 1.0)
+	for surface: SmokeSurface in _smoke_surfaces.values():
+		surface.simulate(delta)
 
 
 func interact(by: Player) -> void:
@@ -168,6 +186,7 @@ func _setup_smoke() -> void:
 		var surface := SmokeSurface.new()
 		surface.setup(self, room, config)
 		room.add_child(surface)
+		_smoke_surfaces[room] = surface
 
 
 ## Darkens the world with a CanvasModulate and gives the player's light its settings.

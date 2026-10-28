@@ -12,6 +12,13 @@ See `art/rooms/lab_reference.webp` for the target style. It's already used as th
 
 Each room is a single painting with its walls, floor and decoration painted in.
 
+Every room uses the **default room painting** (`room_background` in `art/art_theme.tres`,
+currently `art/rooms/room_floor.webp`) unless it has its own. The painting is stretched over the
+room, so it fits best on rooms with the same proportions as the image (10:7, e.g. 1000x700).
+Long or tall rooms get their own painting, or a differently shaped default.
+
+To give a room its own painting:
+
 1. Save the painting in `art/rooms/` (PNG or WebP).
 2. Open the level scene (`scenes/levels/level_NN.tscn`), select the room under `Rooms`, and drag
    the image into **Background**. The painting is stretched over the room's **Size**, so paint
@@ -44,7 +51,7 @@ level, in world pixels), keeping the aspect ratio. Doors stretch to fill theirs.
 | `vent_on` / `vent_off` | A running vent spins its sprite. Set `spin_speed = 0` on the vent to stop that. |
 | `smoke_source` | Pulses. Set `pulse_amount = 0` to stop. |
 | `exit` | The escape hatch. |
-| `smoke_frames` | The smoke animation: tileable frames played in order and looped (see **Smoke** below). |
+| `smoke_sheet` / `smoke_frames`, `smoke_edge_mask` | The smoke animation and where it breaks up (see **Smoke** below). |
 | `highlight` | Stretched around whatever the player can interact with. |
 
 ## Smoke
@@ -58,15 +65,27 @@ visible, so the edge of a cloud takes its ragged shape from the texture itself.
 - Every frame must **tile seamlessly**: the left edge continues the right edge, and the top
   continues the bottom. All frames should be the same size and show the same smoke in slightly
   different shapes, so swapping between them reads as movement (a "boil").
-- Paint the smoke on a **transparent background**, and use opacity to show how thick it is.
-  Thick, opaque areas are the last to disappear when smoke thins. If the frames come
-  white-on-black with no transparency instead, set `alpha_source` to *Luminance* in the smoke
-  settings.
-- Paint it **white/grey** and let `tint` color it, or paint it in color and set `tint` to white.
+- Use opacity to show how thick the smoke is. Its most opaque parts (like outlines) are the
+  last to disappear when smoke thins. If the frames come white-on-black with no transparency
+  instead, set `alpha_source` to *Luminance* in the smoke settings.
+- Paint it in color and keep `tint` white, or paint it white/grey and let `tint` color it.
 
-**Plugging them in:** open `art/art_theme.tres` and put the frames, in order, into
-**Smoke Frames**. Any number of frames works. The two in `art/placeholder/smoke_frame_*.png` are
-placeholders.
+**Plugging them in:** open `art/art_theme.tres`. The current art is a sheet,
+`art/effects/smoke_sheet.webp`: a 2×2 grid of 1000 px cells, using the top-left and top-right
+cells as frames. The bottom row is a tiling preview and is ignored.
+
+- **One image with all frames:** put it in **Smoke Sheet**, set **Smoke Sheet Columns / Rows**
+  to its grid, and list the cells to play, in order, in **Smoke Sheet Frames** (0 = top-left,
+  counting left to right, then down).
+- **Separate images:** clear **Smoke Sheet** and put the frames, in order, into **Smoke Frames**.
+
+Any number of frames works.
+
+**Edge mask:** large evenly see-through areas (like this art's mauve fill) would otherwise fade
+out flatly. **Smoke Edge Mask** (`art/effects/smoke_edge_mask.png`, soft noise) breaks thin
+smoke into ragged billows instead, while the art's own outlines stay visible as wisps. The
+artist can paint a replacement: a tileable image whose most opaque areas are where the smoke
+should hold on longest. Clear the slot to use only the frames' own transparency.
 
 **Tuning:** everything else is in **`config/smoke.tres`** (a level can use its own through its
 Level node's **Smoke Config**):
@@ -80,7 +99,8 @@ Level node's **Smoke Config**):
 | `crossfade` | 0 = frames swap instantly (hand-drawn boil), 1 = they blend smoothly. |
 | `drift` | Slow slide of the texture, in world pixels per second. |
 | `edge_breakup`, `edge_softness` | How ragged thin smoke looks (0 = plain fade), and how soft those ragged edges are. |
-| `cell_size`, `spread_speed`, `fill_speed` | How finely and how fast smoke visibly creeps in from doors and sources and gets pulled toward vents. |
+| `edge_mask_size` | World size of one repeat of the edge mask. Larger = bigger, calmer billows. |
+| `cell_size`, `spread_speed`, `fill_speed` | How finely and how fast smoke visibly creeps in from doors and sources and gets pulled toward vents. Smoke only passes a door once it has spread up to it, so `spread_speed` also sets how soon it reaches the next room. |
 
 These only change how the smoke looks. How much smoke a room holds, and how dangerous it is,
 are set by the smoke sources, vents and doors in the level.

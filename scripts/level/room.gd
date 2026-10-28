@@ -15,11 +15,12 @@ enum Edge { TOP, BOTTOM, LEFT, RIGHT }
 	set(value):
 		size = value
 		queue_redraw()
-## The room's painting. Leave empty to draw a placeholder.
+## The room's own painting. Leave empty to use the ArtTheme's `room_background`
+## (or a placeholder if that is empty too).
 @export var background: Texture2D:
 	set(value):
 		background = value
-		queue_redraw()
+		_resolve_painting()
 ## Thickness of the painted border that counts as wall.
 @export var wall_thickness := 28.0:
 	set(value):
@@ -30,10 +31,14 @@ enum Edge { TOP, BOTTOM, LEFT, RIGHT }
 ## Current smoke level, 0 (clean) to 1 (unbreathable).
 var smoke := 0.0
 var doors: Array[Door] = []
+## The texture actually drawn. Resolved outside _draw(): a texture first loaded during
+## drawing renders as plain white.
+var _painting: Texture2D
 
 
 func _ready() -> void:
 	smoke = start_smoke
+	_resolve_painting()
 
 
 func rect() -> Rect2:
@@ -123,10 +128,15 @@ func _add_wall(edge: Edge, span: Vector2) -> void:
 
 func _draw() -> void:
 	var area := Rect2(Vector2.ZERO, size)
-	if background:
-		draw_texture_rect(background, area, false)
+	if _painting:
+		draw_texture_rect(_painting, area, false)
 	else:
 		_draw_placeholder(area)
+
+
+func _resolve_painting() -> void:
+	_painting = background if background else ArtTheme.active().room_background
+	queue_redraw()
 
 
 func _draw_placeholder(area: Rect2) -> void:

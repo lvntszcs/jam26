@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ddq2j1kftyw7x"
-path="res://.godot/imported/smoke_frame_1.png-0fc9985cdb72ea7f18862a100acc2aae.ctex"
+uid="uid://csoyvl4s38dq7"
+path="res://.godot/imported/room_floor.webp-7b439eacc5db680453df3485c9a7dcb6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/placeholder/smoke_frame_1.png"
-dest_files=["res://.godot/imported/smoke_frame_1.png-0fc9985cdb72ea7f18862a100acc2aae.ctex"]
+source_file="res://art/rooms/room_floor.webp"
+dest_files=["res://.godot/imported/room_floor.webp-7b439eacc5db680453df3485c9a7dcb6.ctex"]
 
 [params]
 
