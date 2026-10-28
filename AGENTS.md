@@ -32,7 +32,9 @@ facility by finding a way past fixed gas zones and switching vents. Each room is
 
 - `scripts/core/`: `Palette` and `ArtTheme` (shared sprites; `ArtTheme.active()`).
 - `scripts/level/`: `Level` (finds rooms, doors, gas zones and objects, links doors, lets vents
-  clear gas and handles interactions) and `Room` (painting, generated walls with door gaps).
+  clear gas and handles interactions), `Room` (painting, generated walls with door gaps; a
+  `crawl_space` room, like the vent duct, makes the player crawl) and `Maze` (interior walls from
+  a text layout or from the room painting's transparency).
 - `scripts/smoke/`: `GasZone` (a fixed rectangle of Low/Medium/Strong gas, placed in the level
   or on the Level in `main.tscn`; it never spreads, and a running Vent in its room clears it),
   `SmokeConfig` (gas strengths, clear speed and look, default `config/smoke.tres`, per-level
