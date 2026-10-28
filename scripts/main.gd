@@ -53,6 +53,8 @@ func load_level(index: int, placed: Level = null) -> void:
 	_level.failed.connect(_on_level_failed)
 	_level.prompt_changed.connect(hud.set_prompt)
 	_level.player.air_changed.connect(hud.set_air)
+	_level.player.keycard_changed.connect(hud.set_keycard)
+	hud.set_keycard(_level.player.keycard_level)
 	hud.show_level(_level.title, _level.hint)
 	hud.set_air(_level.player.air, _level.player.max_air)
 	_state = State.PLAYING

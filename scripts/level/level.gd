@@ -223,7 +223,8 @@ func _add_void_backdrop() -> void:
 func _check_exits() -> void:
 	for object in objects:
 		var exit := object as Exit
-		if exit and player.global_position.distance_to(exit.global_position) <= exit.reach_radius:
+		if exit and exit.can_leave(player) \
+				and player.global_position.distance_to(exit.global_position) <= exit.reach_radius:
 			complete()
 			return
 

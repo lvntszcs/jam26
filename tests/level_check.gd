@@ -82,6 +82,8 @@ func _check_level(scene: PackedScene) -> void:
 		_expect(_reachable(level, level.room_at(level.player.global_position), exits[0].room), name,
 			"exit room reachable with all doors open")
 
+	_check_keycards(level, name)
+
 	# Gas zones sit in a room, the player doesn't start in gas, and gas never spreads.
 	for zone in level.gas_zones:
 		_expect(zone.room != null, name, "%s is inside a room" % zone.name)
@@ -134,6 +136,32 @@ func _check_level(scene: PackedScene) -> void:
 
 	remove_child(level)
 	level.free()
+
+
+## Locked doors and exits stay shut without a good enough keycard, the level's keycard
+## stations (used in order) are enough for all of them, and they open afterwards.
+## Leaves the player with the highest keycard.
+func _check_keycards(level: Level, level_name: String) -> void:
+	var player := level.player
+	var locked := level.doors.filter(func(d: Door) -> bool: return d.is_locked() and not d.is_open)
+	var exits := level.objects.filter(func(o: GameObject) -> bool: return o is Exit)
+	for door: Door in locked:
+		door.interact(player)
+		_expect(not door.is_open, level_name, "%s stays shut without a keycard" % door.name)
+	for exit: Exit in exits:
+		if exit.required_keycard > 0:
+			_expect(not exit.can_leave(player), level_name, "%s is locked without a keycard" % exit.name)
+	var stations := level.objects.filter(func(o: GameObject) -> bool: return o is KeycardStation)
+	stations.sort_custom(func(a: KeycardStation, b: KeycardStation) -> bool: return a.requires_level < b.requires_level)
+	for station: KeycardStation in stations:
+		station.interact(player)
+		_expect(player.keycard_level >= station.gives_level, level_name, "%s gives keycard level %d" % [station.name, station.gives_level])
+	for door: Door in locked:
+		door.interact(player)
+		_expect(door.is_open and not door.is_locked(), level_name, "%s opens with the keycard" % door.name)
+		door.interact(player)
+	for exit: Exit in exits:
+		_expect(exit.can_leave(player), level_name, "the level's keycards unlock %s" % exit.name)
 
 
 func _check_damage_feedback(level: Level, level_name: String) -> void:

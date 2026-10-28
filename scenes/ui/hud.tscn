@@ -45,6 +45,12 @@ size_flags_horizontal = 3
 theme_type_variation = &"TitleLabel"
 text = "Level title"
 
+[node name="Keycard" type="Label" parent="Root/Margin/Layout/TopBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "KEYCARD 1"
+
 [node name="AirLabel" type="Label" parent="Root/Margin/Layout/TopBar"]
 layout_mode = 2
 text = "AIR"
