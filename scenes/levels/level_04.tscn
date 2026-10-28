@@ -166,28 +166,155 @@ solid = false
 
 [node name="Gas" type="Node2D" parent="." unique_id=1058568288]
 
-[node name="ControlRoomGas" type="Node2D" parent="Gas" unique_id=121836963]
+[node name="ControlRoomGas" type="Node2D" parent="Gas"]
 position = Vector2(450, 150)
 script = ExtResource("gas_zone")
 strength = 2
 size = Vector2(1200, 1000)
 
-[node name="NorthMazeGas" type="Node2D" parent="Gas" unique_id=620086847]
+[node name="NorthMazeTopGas" type="Node2D" parent="Gas"]
 position = Vector2(150, 1150)
 script = ExtResource("gas_zone")
-strength = 0
-size = Vector2(2100, 1425)
+strength = 2
+size = Vector2(2100, 350)
 
-[node name="AirlockGas" type="Node2D" parent="Gas" unique_id=171927977]
-position = Vector2(3050, 2450)
-script = ExtResource("gas_zone")
-size = Vector2(400, 300)
-
-[node name="LabGas" type="Node2D" parent="Gas" unique_id=785070240]
-position = Vector2(2250, 1150)
+[node name="NorthMazeWestGas" type="Node2D" parent="Gas"]
+position = Vector2(150, 1500)
 script = ExtResource("gas_zone")
 strength = 2
-size = Vector2(1900, 1300)
+size = Vector2(225, 300)
+
+[node name="NorthMazeMediumGas" type="Node2D" parent="Gas"]
+position = Vector2(375, 1500)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(600, 300)
+
+[node name="NorthMazeEastGas" type="Node2D" parent="Gas"]
+position = Vector2(975, 1500)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(1275, 525)
+
+[node name="NorthMazeSouthWestGas" type="Node2D" parent="Gas"]
+position = Vector2(150, 1800)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(525, 775)
+
+[node name="NorthMazeMediumStripGas" type="Node2D" parent="Gas"]
+position = Vector2(675, 1800)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(300, 775)
+
+[node name="NorthMazeMediumBandGas" type="Node2D" parent="Gas"]
+position = Vector2(975, 2025)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(675, 150)
+
+[node name="NorthMazeSouthEastGas" type="Node2D" parent="Gas"]
+position = Vector2(1650, 2025)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(600, 550)
+
+[node name="SwitchCorridorGas" type="Node2D" parent="Gas"]
+position = Vector2(975, 2175)
+script = ExtResource("gas_zone")
+strength = 0
+size = Vector2(675, 400)
+
+[node name="WestMazeGas" type="Node2D" parent="Gas"]
+position = Vector2(150, 2575)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(375, 950)
+
+[node name="WestMazeMediumGas" type="Node2D" parent="Gas"]
+position = Vector2(525, 2575)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(375, 950)
+
+[node name="WestMazeSouthGas" type="Node2D" parent="Gas"]
+position = Vector2(150, 3525)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(750, 1150)
+
+[node name="SouthMazeTopGas" type="Node2D" parent="Gas"]
+position = Vector2(900, 3700)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(1200, 200)
+
+[node name="SouthMazeWestGas" type="Node2D" parent="Gas"]
+position = Vector2(900, 3900)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(300, 775)
+
+[node name="SouthMazeMediumGas" type="Node2D" parent="Gas"]
+position = Vector2(1200, 3900)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(750, 225)
+
+[node name="SouthMazeEastGas" type="Node2D" parent="Gas"]
+position = Vector2(1950, 3900)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(150, 775)
+
+[node name="SouthMazeBottomGas" type="Node2D" parent="Gas"]
+position = Vector2(1200, 4125)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(750, 550)
+
+[node name="ComputerRoomMediumGas" type="Node2D" parent="Gas"]
+position = Vector2(2250, 1150)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(1350, 575)
+
+[node name="ComputerRoomLowGas" type="Node2D" parent="Gas"]
+position = Vector2(3600, 1150)
+script = ExtResource("gas_zone")
+strength = 0
+size = Vector2(550, 575)
+
+[node name="ComputerRoomGas" type="Node2D" parent="Gas"]
+position = Vector2(2250, 1725)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(1425, 725)
+
+[node name="ComputerRoomEdgeMediumGas" type="Node2D" parent="Gas"]
+position = Vector2(3675, 1725)
+script = ExtResource("gas_zone")
+strength = 1
+size = Vector2(150, 725)
+
+[node name="ComputerRoomEdgeLowGas" type="Node2D" parent="Gas"]
+position = Vector2(3825, 1725)
+script = ExtResource("gas_zone")
+strength = 0
+size = Vector2(325, 725)
+
+[node name="AirlockGas" type="Node2D" parent="Gas"]
+position = Vector2(3050, 2450)
+script = ExtResource("gas_zone")
+strength = 2
+size = Vector2(400, 300)
+
+[node name="LabRoomLowGas" type="Node2D" parent="Gas"]
+position = Vector2(3075, 2750)
+script = ExtResource("gas_zone")
+strength = 0
+size = Vector2(375, 150)
 
 [node name="Objects" type="Node2D" parent="." unique_id=1160109833]
 
