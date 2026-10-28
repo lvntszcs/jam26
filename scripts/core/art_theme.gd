@@ -1,12 +1,17 @@
 @tool
 class_name ArtTheme
 extends Resource
-## Maps every shared visual in the game to a texture. Room paintings are not here: each Room
-## node has its own `background`.
+## Maps every shared visual in the game to a texture. A Room can override the default room
+## background with its own `background` painting.
 ## The active theme is res://art/art_theme.tres. See art/README.md for how to swap art.
 ## Textures can be any resolution. Each object fits its art into its own `footprint`.
 
 const ACTIVE_PATH := "res://art/art_theme.tres"
+
+@export_group("Rooms")
+## Painting used for every room that has no `background` of its own. It's stretched over the
+## room, so it looks best on rooms with the same aspect ratio (1000x700 for a 2000x1400 image).
+@export var room_background: Texture2D
 
 @export_group("Player")
 ## The player seen from above, as a grid of equally sized frames, read left to right and

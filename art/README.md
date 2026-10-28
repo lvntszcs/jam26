@@ -12,6 +12,13 @@ See `art/rooms/lab_reference.webp` for the target style. It's already used as th
 
 Each room is a single painting with its walls, floor and decoration painted in.
 
+Every room uses the **default room painting** (`room_background` in `art/art_theme.tres`,
+currently `art/rooms/room_floor.webp`) unless it has its own. The painting is stretched over the
+room, so it fits best on rooms with the same proportions as the image (10:7, e.g. 1000x700).
+Long or tall rooms get their own painting, or a differently shaped default.
+
+To give a room its own painting:
+
 1. Save the painting in `art/rooms/` (PNG or WebP).
 2. Open the level scene (`scenes/levels/level_NN.tscn`), select the room under `Rooms`, and drag
    the image into **Background**. The painting is stretched over the room's **Size**, so paint

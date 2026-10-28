@@ -51,6 +51,7 @@ Conventions:
 - Entity and room scripts are `@tool` so levels preview in the editor. Guard runtime-only code
   with `Engine.is_editor_hint()`.
 - See `scenes/levels/README.md` for building levels and adding object types.
-- Avoid mixing `draw_rect` and `draw_texture_rect` in one `_draw()`. On this setup the textures
-  then render as solid squares, so use `Sprite2D` nodes for textured effects.
+- Never load a texture (including through `ArtTheme.active()`) for the first time inside
+  `_draw()`. It renders as solid white. Resolve textures in `_ready()` or setters and cache
+  them, as `Room._resolve_painting()` does.
 - Run `godot --headless --path . res://tests/level_check.tscn` after changing levels or gameplay.
